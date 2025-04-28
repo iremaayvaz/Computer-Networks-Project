@@ -2,18 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package com.mycompany.project1;
+package com.mycompany.project1.game_ui;
 
 /**
  *
  * @author iremayvaz
  */
-public class Main_page extends javax.swing.JFrame {
+public class Login_page extends javax.swing.JFrame {
 
     /**
      * Creates new form Login_page
      */
-    public Main_page() {
+    public Login_page() {
         initComponents();
     }
 
@@ -27,56 +27,63 @@ public class Main_page extends javax.swing.JFrame {
     private void initComponents() {
 
         pnl_login = new javax.swing.JPanel();
-        lbl_register = new javax.swing.JLabel();
-        btn_register = new javax.swing.JButton();
+        lbl_icon = new javax.swing.JLabel();
+        txt_gamer_name = new javax.swing.JTextField();
+        btn_giris = new javax.swing.JButton();
+        lbl_giris = new javax.swing.JLabel();
         lbl_login = new javax.swing.JLabel();
-        btn_login = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        pnl_login.setBackground(new java.awt.Color(51, 204, 255));
+        pnl_login.setBackground(new java.awt.Color(0, 0, 0));
 
-        lbl_register.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
-        lbl_register.setForeground(new java.awt.Color(255, 255, 255));
-        lbl_register.setText("Yeni Bir Oyuncuyum!");
+        lbl_icon.setFont(new java.awt.Font("Helvetica Neue", 1, 30)); // NOI18N
+        lbl_icon.setForeground(new java.awt.Color(255, 255, 255));
+        lbl_icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/project1/game_ui/header.jpg"))); // NOI18N
 
-        btn_register.setText("RISK Oynamaya Başla!");
+        btn_giris.setBackground(new java.awt.Color(0, 204, 255));
+        btn_giris.setText("Giriş Yap");
 
-        lbl_login.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
+        lbl_giris.setForeground(new java.awt.Color(255, 255, 255));
+        lbl_giris.setText("Oyuncu adı giriniz:");
+
+        lbl_login.setFont(new java.awt.Font("Helvetica Neue", 1, 30)); // NOI18N
         lbl_login.setForeground(new java.awt.Color(255, 255, 255));
-        lbl_login.setText("Hesabım Var");
-
-        btn_login.setText("Giriş Yap");
+        lbl_login.setText("RISK'E HOŞGELDİNİZ!");
 
         javax.swing.GroupLayout pnl_loginLayout = new javax.swing.GroupLayout(pnl_login);
         pnl_login.setLayout(pnl_loginLayout);
         pnl_loginLayout.setHorizontalGroup(
             pnl_loginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_loginLayout.createSequentialGroup()
-                .addGap(74, 74, 74)
-                .addComponent(btn_register)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btn_login)
-                .addGap(127, 127, 127))
-            .addGroup(pnl_loginLayout.createSequentialGroup()
-                .addGap(65, 65, 65)
-                .addComponent(lbl_register, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(134, 134, 134)
-                .addComponent(lbl_login)
-                .addContainerGap(117, Short.MAX_VALUE))
+                .addGap(81, 81, 81)
+                .addGroup(pnl_loginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnl_loginLayout.createSequentialGroup()
+                        .addGap(72, 72, 72)
+                        .addComponent(lbl_login))
+                    .addGroup(pnl_loginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl_loginLayout.createSequentialGroup()
+                            .addComponent(lbl_giris)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txt_gamer_name, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(btn_giris))
+                        .addComponent(lbl_icon)))
+                .addContainerGap(92, Short.MAX_VALUE))
         );
         pnl_loginLayout.setVerticalGroup(
             pnl_loginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_loginLayout.createSequentialGroup()
-                .addGap(98, 98, 98)
+                .addGap(39, 39, 39)
+                .addComponent(lbl_icon)
+                .addGap(18, 18, 18)
+                .addComponent(lbl_login)
+                .addGap(26, 26, 26)
                 .addGroup(pnl_loginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_register)
-                    .addComponent(lbl_login))
-                .addGap(64, 64, 64)
-                .addGroup(pnl_loginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_register)
-                    .addComponent(btn_login))
-                .addContainerGap(90, Short.MAX_VALUE))
+                    .addComponent(lbl_giris)
+                    .addComponent(txt_gamer_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_giris))
+                .addContainerGap(40, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -87,7 +94,7 @@ public class Main_page extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnl_login, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(pnl_login, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -110,32 +117,30 @@ public class Main_page extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Main_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Main_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Main_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Main_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Main_page().setVisible(true);
+                new Login_page().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_login;
-    private javax.swing.JButton btn_register;
+    private javax.swing.JButton btn_giris;
+    private javax.swing.JLabel lbl_giris;
+    private javax.swing.JLabel lbl_icon;
     private javax.swing.JLabel lbl_login;
-    private javax.swing.JLabel lbl_register;
     private javax.swing.JPanel pnl_login;
+    private javax.swing.JTextField txt_gamer_name;
     // End of variables declaration//GEN-END:variables
 }

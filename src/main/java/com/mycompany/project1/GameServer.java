@@ -4,17 +4,10 @@
  */
 package com.mycompany.project1;
 
-import java.net.InetAddress;
-
 /**
  *
  * @author iremayvaz
  */
-public class Gamer {
-    public String gamerID;
-    public InetAddress ip;
-    public int port;
-    public Bonus_kartlari cards;
-    public Bonus joker;
+public class GameServer {
     
 }
