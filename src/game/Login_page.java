@@ -114,9 +114,9 @@ public class Login_page extends javax.swing.JFrame {
     private void btn_girisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_girisActionPerformed
         String gamer_name = txt_gamer_name.getText();
             
-            Game_page oyun;
+            Game oyun;
         try {
-            oyun = new Game_page(gamer_name);
+            oyun = new Game(gamer_name);
             oyun.setVisible(true);
             this.dispose();
         } catch (IOException ex) {

@@ -147,7 +147,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JToggleButton" name="btn_asia">
+        <Component class="javax.swing.JToggleButton" name="btn_asya">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Helvetica Neue" size="48" style="1"/>

@@ -7,6 +7,7 @@ package game;
 import client.Client;
 import static game.Map.all_territories;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -16,26 +17,20 @@ import javax.swing.JButton;
  *
  * @author iremayvaz
  */
-public class Game_page extends javax.swing.JFrame {
-
-    Client client;
-
-    /**
-     * Creates new form Game_page
-     */
-    public Game_page(String name) throws IOException {
+public class Game extends javax.swing.JFrame {
+    
+    public Game(String name) throws IOException {
         initComponents();
         comboBox_moveTroops.setVisible(false);
 
         // Player 
         
-        // Harita oluşturuldu.
+        // Game'in haritası oluşturuldu.
         Map yeniHarita = new Map(); // her oyuncu bağlandığında yeni harita ve yeni bölge dağıtımları oluşuyor oluşmamalı!!!!!!!
-        
 
         // Her JButton bir Territory temsili
         Territory afrika = new Territory("Afrika", btn_afrika);
-        Territory asya = new Territory("Asya", btn_asia);
+        Territory asya = new Territory("Asya", btn_asya);
         Territory avrupa = new Territory("Avrupa", btn_avrupa);
         Territory avustralya = new Territory("Avustralya", btn_avustralya);
         Territory guney_amerika = new Territory("Güney Amerika", btn_guneyAmerika);
@@ -96,7 +91,7 @@ public class Game_page extends javax.swing.JFrame {
         lbl_otherClient = new javax.swing.JLabel();
         lbl_state = new javax.swing.JLabel();
         comboBox_moveTroops = new javax.swing.JComboBox<>();
-        btn_asia = new javax.swing.JToggleButton();
+        btn_asya = new javax.swing.JToggleButton();
         btn_avustralya = new javax.swing.JToggleButton();
         btn_avrupa = new javax.swing.JToggleButton();
         btn_afrika = new javax.swing.JToggleButton();
@@ -140,15 +135,15 @@ public class Game_page extends javax.swing.JFrame {
         comboBox_moveTroops.setForeground(new java.awt.Color(255, 255, 255));
         pnl_harita.add(comboBox_moveTroops, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 330, 80, -1));
 
-        btn_asia.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
-        btn_asia.setForeground(new java.awt.Color(255, 255, 255));
-        btn_asia.setText("0");
-        btn_asia.setBorder(null);
-        btn_asia.setBorderPainted(false);
-        btn_asia.setContentAreaFilled(false);
-        btn_asia.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btn_asia.setFocusPainted(false);
-        pnl_harita.add(btn_asia, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 160, 170, 210));
+        btn_asya.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
+        btn_asya.setForeground(new java.awt.Color(255, 255, 255));
+        btn_asya.setText("0");
+        btn_asya.setBorder(null);
+        btn_asya.setBorderPainted(false);
+        btn_asya.setContentAreaFilled(false);
+        btn_asya.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btn_asya.setFocusPainted(false);
+        pnl_harita.add(btn_asya, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 160, 170, 210));
 
         btn_avustralya.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
         btn_avustralya.setForeground(new java.awt.Color(255, 255, 255));
@@ -272,14 +267,28 @@ public class Game_page extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Game_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Game_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Game_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Game_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
@@ -287,9 +296,9 @@ public class Game_page extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new Game_page("test").setVisible(true);
+                    new Game("test").setVisible(true);
                 } catch (IOException ex) {
-                    Logger.getLogger(Game_page.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
@@ -297,7 +306,7 @@ public class Game_page extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btn_afrika;
-    private javax.swing.JToggleButton btn_asia;
+    private javax.swing.JToggleButton btn_asya;
     private javax.swing.JToggleButton btn_attack;
     private javax.swing.JToggleButton btn_avrupa;
     private javax.swing.JToggleButton btn_avustralya;
