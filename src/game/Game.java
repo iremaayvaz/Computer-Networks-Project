@@ -19,9 +19,12 @@ import javax.swing.JButton;
  */
 public class Game extends javax.swing.JFrame {
     
+    public static Game game;
+    
     public Game(String name) throws IOException {
         initComponents();
         comboBox_moveTroops.setVisible(false);
+        Game.game = this;
 
         // Player 
         
@@ -317,9 +320,9 @@ public class Game extends javax.swing.JFrame {
     private javax.swing.JComboBox<Integer> comboBox_moveTroops;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel lbl_harita;
-    private javax.swing.JLabel lbl_localClient;
+    public javax.swing.JLabel lbl_localClient;
     private javax.swing.JLabel lbl_opponent;
-    private javax.swing.JLabel lbl_otherClient;
+    public javax.swing.JLabel lbl_otherClient;
     private javax.swing.JLabel lbl_state;
     private javax.swing.JLabel lbl_you;
     private javax.swing.JPanel pnl_harita;

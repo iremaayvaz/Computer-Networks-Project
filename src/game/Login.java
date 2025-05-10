@@ -12,14 +12,18 @@ import java.util.logging.Logger;
  *
  * @author iremayvaz
  */
-public class Login_page extends javax.swing.JFrame {
+public class Login extends javax.swing.JFrame {
 
     /**
      * Creates new form Login_page
      */
-    public Login_page() throws IOException {
+    
+    public static Login login;
+    
+    public Login() throws IOException {
         
         initComponents();
+        Login.login = this; // başka sınıflardan Frame'e tamamiyle erişmek için
     }
 
     /**
@@ -97,6 +101,8 @@ public class Login_page extends javax.swing.JFrame {
                 .addGap(46, 46, 46))
         );
 
+        txt_gamer_name.getAccessibleContext().setAccessibleParent(this);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,7 +126,7 @@ public class Login_page extends javax.swing.JFrame {
             oyun.setVisible(true);
             this.dispose();
         } catch (IOException ex) {
-            Logger.getLogger(Login_page.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }//GEN-LAST:event_btn_girisActionPerformed
@@ -142,14 +148,16 @@ public class Login_page extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Login_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Login_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Login_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Login_page.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
@@ -157,9 +165,9 @@ public class Login_page extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new Login_page().setVisible(true);
+                    new Login().setVisible(true);
                 } catch (IOException ex) {
-                    Logger.getLogger(Login_page.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
@@ -171,6 +179,6 @@ public class Login_page extends javax.swing.JFrame {
     private javax.swing.JLabel lbl_icon;
     private javax.swing.JLabel lbl_login;
     private javax.swing.JPanel pnl_login;
-    private javax.swing.JTextField txt_gamer_name;
+    public javax.swing.JTextField txt_gamer_name;
     // End of variables declaration//GEN-END:variables
 }
