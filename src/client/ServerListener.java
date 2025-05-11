@@ -12,8 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 
- * Server'dan gelen mesajları dinler
+ *
+ * Server'dan gelen mesajları dinler Client tarafı
  *
  * @author iremayvaz
  */
@@ -36,15 +36,18 @@ public class ServerListener extends Thread {
 
     public void handleIncomingMessage(Message incomingMessage) throws IOException {
         switch (incomingMessage.message_type) {
-
-            case JOIN_SERVER:
-            case DISCONNECT:
             case YOUR_ID:
-
+                Game.map.player.id = Integer.parseInt(incomingMessage.content.toString()); // oyuncunun id'si client id'si ile eşitlenir.
             case OPPONENT_FOUND: // Rakip bulunduysa
                 Game.game.lbl_otherClient.setText(incomingMessage.content.toString()); // Rakibin ismi yazılır.
                 break;
-            case SKIP_TURN:
+                
+            // DURUM LABEL'INI GÜNCELLE
+            case YOUR_TURN: 
+                Game.game.lbl_state.setText(incomingMessage.content.toString());
+
+            case OPPONENTS_TURN:
+                Game.game.lbl_state.setText(incomingMessage.content.toString());
             case DICE_ROLL:
             case DICE_RESULT:
             case GAME_OVER:

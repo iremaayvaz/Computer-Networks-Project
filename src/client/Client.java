@@ -39,7 +39,7 @@ public class Client {
         // İlk bağlantı mesajı
         Message first_msg = new Message(Message.Type.JOIN_SERVER, 
                                         Login.login.txt_gamer_name.getText());
-        Client.SendMessageToServer(first_msg);
+        Client.SendMessageToServer(first_msg); // İsim ve bağlantı bilgisi gönderildi
     }
     
     public static void SendMessageToServer(Message message) throws IOException {

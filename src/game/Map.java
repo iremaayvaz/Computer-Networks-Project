@@ -21,12 +21,9 @@ public class Map {
     public static ArrayList<Territory> all_territories; // Haritadaki fethedilecek bölgeler
     public static Player player;
     public static Player opponent;
-    public static Dice dice;
 
     public Map() {
         this.all_territories = new ArrayList<>();
-        this.dice = new Dice();
-     
     }
 
     public void addTerritory(Territory territory) {

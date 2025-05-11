@@ -16,12 +16,18 @@ public class Message implements java.io.Serializable {
     
     public enum Type // Mesaj türleri
     {
+        /**
+         * Login yapınca isimle server'a bilgi verilebilir
+         * 2. login olunca 2 tarafa da opponent found mesajı verilebilir?
+         */
         JOIN_SERVER, // Sunucuya katılma isteği
         DISCONNECT, // Bağlantı koptu
-        YOUR_ID, // OYUNCUYA ID
+        YOUR_ID,
         OPPONENT_FOUND, // Rakip bulundu, oyun başlasın
         
         SKIP_TURN, // Sıra pas geçme
+        YOUR_TURN,
+        OPPONENTS_TURN,
         DICE_ROLL, // Zar atma 
         DICE_RESULT, // Zar atış sonucu
         GAME_OVER // Oyun sonu

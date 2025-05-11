@@ -20,16 +20,16 @@ import javax.swing.JButton;
 public class Game extends javax.swing.JFrame {
     
     public static Game game;
+    public static Map map;
+    public static Dice dice;
     
     public Game(String name) throws IOException {
         initComponents();
         comboBox_moveTroops.setVisible(false);
         Game.game = this;
-
-        // Player 
         
         // Game'in haritası oluşturuldu.
-        Map yeniHarita = new Map(); // her oyuncu bağlandığında yeni harita ve yeni bölge dağıtımları oluşuyor oluşmamalı!!!!!!!
+        Game.map = new Map(); // her oyuncu bağlandığında yeni harita ve yeni bölge dağıtımları oluşuyor oluşmamalı!!!!!!!
 
         // Her JButton bir Territory temsili
         Territory afrika = new Territory("Afrika", btn_afrika);
@@ -60,18 +60,18 @@ public class Game extends javax.swing.JFrame {
         kuzey_amerika.addNeighbours(avrupa);
 
         // Her territory'yi bölgeye ekle
-        yeniHarita.addTerritory(afrika);
-        yeniHarita.addTerritory(asya);
-        yeniHarita.addTerritory(avrupa);
-        yeniHarita.addTerritory(avustralya);
-        yeniHarita.addTerritory(guney_amerika);
-        yeniHarita.addTerritory(kuzey_amerika);
+        Game.map.addTerritory(afrika);
+        Game.map.addTerritory(asya);
+        Game.map.addTerritory(avrupa);
+        Game.map.addTerritory(avustralya);
+        Game.map.addTerritory(guney_amerika);
+        Game.map.addTerritory(kuzey_amerika);
 
         // Toplam territory'ler karışık bir şekilde oyunculara atanır.
-        yeniHarita.defaultTerritories();
+        Game.map.defaultTerritories();
 
         // Oyuncuların askerleri bölgelerine rastgele dağıtılır.
-        yeniHarita.defaultTroops();
+        Game.map.defaultTroops();
 
         //yeniHarita.isOpponentFound(gamers); // rakip ara
         //yeniHarita.startGame();
@@ -323,7 +323,7 @@ public class Game extends javax.swing.JFrame {
     public javax.swing.JLabel lbl_localClient;
     private javax.swing.JLabel lbl_opponent;
     public javax.swing.JLabel lbl_otherClient;
-    private javax.swing.JLabel lbl_state;
+    public javax.swing.JLabel lbl_state;
     private javax.swing.JLabel lbl_you;
     private javax.swing.JPanel pnl_harita;
     // End of variables declaration//GEN-END:variables
