@@ -6,6 +6,7 @@ package game;
 
 import static game.Dice.*;
 import static game.Map.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -13,25 +14,8 @@ import java.util.ArrayList;
  *
  * @author iremayvaz
  */
-public class Player {
-
-    /**
-     * Oyuncu adını girdi bağlandı 
-     * JTextField Login_page server ID verdi 
-     * Server - Sclient 
-     * rastgele bölge ataması (MAP CLASS TARAFINDAN) defaultTerritories 
-     * rastgele asker yerleşimi (oyun başlangıcında) defaultTroops 
-     * saldıran bölge ve saldırılacak bölge seçilsin 
-     * JButtonlarla saldır attack 
-     * saldırılan bölgedeki asker sayılarına göre zar at 
-     * zar sonuclarina bak 
-     * sonuclara göre asker sayılarını güncelle 
-     * güncellenen sayılarla 0'a ulasmadiysa bir taraf
-     * güncel sayılara göre yeniden zar at hangi taraf 0 olduysa kaybetti
-     * kazanan tarafın askeri 2 ye bölünür oyuncu skip yapar karşı oyuncuya
-     * geçer total 9 asker olacak her taraf için
-     *
-     */
+public class Player implements java.io.Serializable {
+    
     public int id;
     public String name;
     public int totalTroops; // birlik sayısı
@@ -39,15 +23,20 @@ public class Player {
     public ArrayList<Integer> zarSonuclari; // her zar atımı sonrası sonuçlar tutulur
 
     public boolean willAttack; // saldırılacak mı
-    public boolean isYourTurn; // sıra benim mi
-
-    public Player(int id, String name) {
-        this.id = id;
+    
+    public Player() {
+        this.id = 0;
+        this.totalTroops = 0;
+        this.territories = new ArrayList<>();
+        this.willAttack = false;
+    }
+    
+    public Player(String name) {
+        this.id = 0;
         this.name = name;
         this.totalTroops = 0;
         this.territories = new ArrayList<>();
         this.willAttack = false;
-        this.isYourTurn = false;
     }
 
     public void addTerritory(Territory takenTerritory) { // If we win the roll-a-dice session,
@@ -66,18 +55,18 @@ public class Player {
         this.totalTroops -= count;
     }
 
-    public boolean isMapTaken() { // Check the finishing condition
+    /*public boolean isMapTaken() { // Check the finishing condition
         if (this.totalTroops == all_territories.size()) { // If total number of all_territories in map equals with
             return true;                           // gamer's total number of all_territories
         } else {
             return false;
         }
-    }
+    }*/
 
     public boolean moveTroops(Territory from, Territory to, int count) { // askerleri bölgelere dağıt
         if (from.totalTroop > 1
                 && // Savunma için 1 kişiyi bölgesinde bırakmalı
-                from.player == to.player
+                from.playerID == to.playerID
                 && // Asker konuşlandırma, aynı bölgelerde yapılır. Rakibin bölgesini fethetmeden oraya asker konuşlandıramam.
                 from.isNeighbour(to)) { // Asker konuşlandırma komşu bölgeler arasında yapılabilir.
             from.addTroops(count);
@@ -88,14 +77,12 @@ public class Player {
         }
     }
 
-    public boolean attack(Territory from, Territory to) { // SALDIR!
+    /*public boolean attack(Territory from, Territory to) { // SALDIR!
         if (from.totalTroop > 1
                 && // Savunma için 1 kişiyi bölgesinde bırakmalı
                 from.player != to.player
                 && // Saldırı farklı oyuncular arasında yapılır
                 from.isNeighbour(to)) { // Saldırı ancak komşu bölgeler arasında yapılabilir.
-            // Saldıran
-            from.player.willAttack = true;
 
             while (from.totalTroop != 0 && to.totalTroop != 0) { // 2 taraftan birinin o bölgedeki asker sayısı 0 olana kadar saldır!
                 int diceCount_p = from.howManyDices();
@@ -119,7 +106,7 @@ public class Player {
         } else {
             return false;
         }
-    }
+    }*/
 }
 /**
  * butonlar 1 askere sahipse oralara basılmamalı

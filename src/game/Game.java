@@ -1,80 +1,90 @@
+package game;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package game;
-
-import client.Client;
-import static game.Map.all_territories;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 /**
+ *
  * Login_page'de rakip bulunana kadar bu sayfa açılmamalı.
  *
  * @author iremayvaz
  */
 public class Game extends javax.swing.JFrame {
-    
+
     public static Game game;
     public static Map map;
     public static Dice dice;
-    
-    public Game(String name) throws IOException {
+
+    public static Player oyuncu = new Player();
+    public boolean isYourTurn; // sıra benim mi
+
+    public static Player rakip = new Player();
+
+    ArrayList<Territory> secilenBolgeler = new ArrayList<>(); // buton selected
+
+    public Game() throws IOException {
         initComponents();
+    }
+
+    public Game(ArrayList<Territory> gelenHarita) throws IOException {
+        initComponents();
+        // en başta sadece attack yapabilsin
+        // yapamiyorsa skip edebilir.
         comboBox_moveTroops.setVisible(false);
+        btn_deploy.setVisible(false);
+
         Game.game = this;
+        Game.map = new Map();
+        Game.map.all_territories = gelenHarita;
+
+        // Territory'leri butonlarla eşle
+        for (Territory t : gelenHarita) {
+            switch (t.name) {
+                case "Afrika":
+                    t.setButton(btn_afrika);
+                case "Asya":
+                    t.setButton(btn_asya);
+                case "Avrupa":
+                    t.setButton(btn_avrupa);
+                case "Avustralya":
+                    t.setButton(btn_avustralya);
+                case "Güney Amerika":
+                    t.setButton(btn_guneyAmerika);
+                case "Kuzey Amerika":
+                    t.setButton(btn_kuzeyAmerika);
+            }
+
+        }
         
-        // Game'in haritası oluşturuldu.
-        Game.map = new Map(); // her oyuncu bağlandığında yeni harita ve yeni bölge dağıtımları oluşuyor oluşmamalı!!!!!!!
+        // Territory'leri oyuncularla eşle
+        for (Territory t : gelenHarita) {
+            if(t.playerID == oyuncu.id){
+                oyuncu.territories.add(t);
+            }else{
+                rakip.territories.add(t);
+            }
+        }
+        
+        for(int i = 0; i < oyuncu.territories.size(); i++){
+            System.out.println(oyuncu.territories.get(i).name.toString() + ":" 
+                    + oyuncu.territories.get(i).playerID + ":" 
+                    + oyuncu.territories.get(i).totalTroop + ":" );
+        }
+        
+        for(int i = 0; i < rakip.territories.size(); i++){
+            System.out.println(rakip.territories.get(i).name.toString() + ":" 
+                    + rakip.territories.get(i).playerID + ":" 
+                    + rakip.territories.get(i).totalTroop + ":" );
+        }
 
-        // Her JButton bir Territory temsili
-        Territory afrika = new Territory("Afrika", btn_afrika);
-        Territory asya = new Territory("Asya", btn_asya);
-        Territory avrupa = new Territory("Avrupa", btn_avrupa);
-        Territory avustralya = new Territory("Avustralya", btn_avustralya);
-        Territory guney_amerika = new Territory("Güney Amerika", btn_guneyAmerika);
-        Territory kuzey_amerika = new Territory("Kuzey Amerika", btn_kuzeyAmerika);
-
-        // Her bölgenin komşularını belirle
-        // ATTACK ve DEPLOY için lazım
-        // AFRİKA
-        afrika.addNeighbours(avrupa);
-        afrika.addNeighbours(asya);
-        // ASYA
-        asya.addNeighbours(afrika);
-        asya.addNeighbours(avrupa);
-        // AVRUPA
-        avrupa.addNeighbours(afrika);
-        avrupa.addNeighbours(asya);
-        avrupa.addNeighbours(kuzey_amerika);
-        // AVUSTRALYA
-        avustralya.addNeighbours(asya);
-        // GÜNEY AMERİKA
-        guney_amerika.addNeighbours(kuzey_amerika);
-        // KUZEY AMERİKA
-        kuzey_amerika.addNeighbours(guney_amerika);
-        kuzey_amerika.addNeighbours(avrupa);
-
-        // Her territory'yi bölgeye ekle
-        Game.map.addTerritory(afrika);
-        Game.map.addTerritory(asya);
-        Game.map.addTerritory(avrupa);
-        Game.map.addTerritory(avustralya);
-        Game.map.addTerritory(guney_amerika);
-        Game.map.addTerritory(kuzey_amerika);
-
-        // Toplam territory'ler karışık bir şekilde oyunculara atanır.
-        Game.map.defaultTerritories();
-
-        // Oyuncuların askerleri bölgelerine rastgele dağıtılır.
-        Game.map.defaultTroops();
-
-        //yeniHarita.isOpponentFound(gamers); // rakip ara
-        //yeniHarita.startGame();
     }
 
     /**
@@ -200,6 +210,11 @@ public class Game extends javax.swing.JFrame {
         btn_attack.setBorderPainted(false);
         btn_attack.setContentAreaFilled(false);
         btn_attack.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btn_attack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_attackActionPerformed(evt);
+            }
+        });
         pnl_harita.add(btn_attack, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 230, -1, -1));
 
         btn_deploy.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
@@ -238,18 +253,57 @@ public class Game extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btn_attackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_attackActionPerformed
+        /* switch (this.secilenBolgeler.size()) {
+            case 0:
+                JOptionPane.showMessageDialog(null, "NO SELECTIONS TO ATTACK!", "WARNING", JOptionPane.WARNING_MESSAGE);
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(null, "SELECT ONE MORE TO ATTACK!", "WARNING", JOptionPane.WARNING_MESSAGE);
+                break;
+            case 2:
+                for (int i = 0; i < Game.map.all_territories.size(); i++) {
+                    if (Game.map.all_territories.get(i).bolge_butonu.isSelected()) {
+                        saldıran = Game.oyuncu.territories.get(i);
+                    }
+                }
+        }
+
+        if () {
+        saldırırken server üzerinden diğer client'a haber
+        saldır
+        saldırı sonucunu yolla
+
+        }*/
+    }//GEN-LAST:event_btn_attackActionPerformed
+
     public Territory getTerritoryByButton(JButton selectedButton) { // Bölgeleri butonundan bulma
-        for (Territory t : all_territories) {
+        for (Territory t : Game.map.all_territories) {
             if (t.bolge_butonu.equals(selectedButton)) {
                 return t;
             }
         }
         return null;
     }
-    
-    public void setComboboxVisible(){
-        if(btn_deploy.isSelected()){ // asker konuşlandırmak istiyorsam 
+
+    public void setComboboxVisible() {
+        if (btn_deploy.isSelected()) { // asker konuşlandırmak istiyorsam 
             comboBox_moveTroops.setVisible(true); // combobox görünür olsun
+        }
+    }
+
+    public void readyToAttack() {
+        if (lbl_state.getText() == "YOUR TURN") {
+            Game.oyuncu.willAttack = true;
+
+        } else { // sıra bende değilse ekrana dokunamam
+            for (Territory t : Game.map.all_territories) {
+                t.bolge_butonu.setEnabled(false);
+            }
+            btn_attack.setEnabled(false);
+            btn_deploy.setEnabled(false);
+            btn_skip.setEnabled(false);
+            JOptionPane.showMessageDialog(null, "NOT YOUR TURN", "UYARI", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -299,7 +353,7 @@ public class Game extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new Game("test").setVisible(true);
+                    new Game().setVisible(true);
                 } catch (IOException ex) {
                     Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
                 }

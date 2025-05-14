@@ -4,7 +4,7 @@
  */
 package game;
 
-import static game.Map.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -14,7 +14,7 @@ import java.util.Random;
  *
  * @author iremayvaz
  */
-public class Dice {
+public class Dice implements java.io.Serializable{
 
     /**
      * Zarı at rollMultiple 
@@ -79,19 +79,19 @@ public class Dice {
         }
     }
 
-    public static void updateTroops(ArrayList<Boolean> dice_results) { // Zar sonuçlarının karşılaştırmalarına göre asker sayılarını güncelle
+    /*public static void updateTroops(ArrayList<Boolean> dice_results) { // Zar sonuçlarının karşılaştırmalarına göre asker sayılarını güncelle
         for (int i = 0; i < dice_results.size(); i++) {
-            if (player.totalTroops != 0 && opponent.totalTroops != 0) {
+            if (oyuncu.totalTroops != 0 && rakip.totalTroops != 0) {
                 switch (dice_results.get(i)) {
                     case true:
-                        opponent.totalTroops--;
+                        rakip.totalTroops--;
                         break;
                     case false:
-                        player.totalTroops--;
+                        oyuncu.totalTroops--;
                         break;
                 }
             }
         }
-    }
+    }*/
 
 }

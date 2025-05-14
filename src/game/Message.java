@@ -20,17 +20,20 @@ public class Message implements java.io.Serializable {
          * Login yapınca isimle server'a bilgi verilebilir
          * 2. login olunca 2 tarafa da opponent found mesajı verilebilir?
          */
-        JOIN_SERVER, // Sunucuya katılma isteği
-        DISCONNECT, // Bağlantı koptu
-        YOUR_ID,
+        JOIN_SERVER, // Sunucuya katılma isteği 
+        YOUR_ID, // Oyuncuya id'sini gönderir
         OPPONENT_FOUND, // Rakip bulundu, oyun başlasın
+        MAP,
+        NAME,
         
         SKIP_TURN, // Sıra pas geçme
-        YOUR_TURN,
-        OPPONENTS_TURN,
-        DICE_ROLL, // Zar atma 
-        DICE_RESULT, // Zar atış sonucu
-        GAME_OVER // Oyun sonu
+        YOUR_TURN, // oyuncunun sırası
+        OPPONENTS_TURN, // rakibin sırası
+        ATTACK, // Saldırı
+        DEPLOY, // Konuşlandırma
+        
+        GAME_OVER, // Oyun sonu
+        DISCONNECT, // Bağlantı koptu
     }
     
     public Type message_type;

@@ -23,14 +23,14 @@ public class Client {
     public static ServerListener server_listener; // server dinleyici
     
     // Server'a IP ve Port ile bağlanır.
-    public void Connect(String ip, int port) throws IOException {
+    public static void Connect(String ip, int port) throws IOException {
         // Server'a bağlan
         Client.csocket = new Socket(ip, port); 
         System.out.println("Server'a bağlandı.");
         
         // Veri alış-verişi
-        Client.cinput = (ObjectInputStream) csocket.getInputStream(); // Veri girişi
-        Client.coutput = (ObjectOutputStream) csocket.getOutputStream(); // Veri çıkışı
+        Client.cinput = new ObjectInputStream(csocket.getInputStream()); // Veri girişi
+        Client.coutput = new ObjectOutputStream(csocket.getOutputStream()); // Veri çıkışı
         
         // Server'ı dinle
         Client.server_listener = new ServerListener(); 

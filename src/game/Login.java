@@ -4,6 +4,7 @@
  */
 package game;
 
+import client.Client;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,13 +18,15 @@ public class Login extends javax.swing.JFrame {
     /**
      * Creates new form Login_page
      */
-    
     public static Login login;
-    
+    public static boolean opponentFound;
+
     public Login() throws IOException {
-        
+
         initComponents();
+        lbl_state.setVisible(false);
         Login.login = this; // başka sınıflardan Frame'e tamamiyle erişmek için
+
     }
 
     /**
@@ -41,6 +44,7 @@ public class Login extends javax.swing.JFrame {
         btn_giris = new javax.swing.JButton();
         lbl_giris = new javax.swing.JLabel();
         lbl_login = new javax.swing.JLabel();
+        lbl_state = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -65,6 +69,10 @@ public class Login extends javax.swing.JFrame {
         lbl_login.setForeground(new java.awt.Color(255, 255, 255));
         lbl_login.setText("RISK'E HOŞGELDİNİZ!");
 
+        lbl_state.setFont(new java.awt.Font("Helvetica Neue", 2, 13)); // NOI18N
+        lbl_state.setForeground(new java.awt.Color(204, 204, 204));
+        lbl_state.setText("Rakip oyuncu bekleniyor...");
+
         javax.swing.GroupLayout pnl_loginLayout = new javax.swing.GroupLayout(pnl_login);
         pnl_login.setLayout(pnl_loginLayout);
         pnl_loginLayout.setHorizontalGroup(
@@ -76,14 +84,16 @@ public class Login extends javax.swing.JFrame {
                         .addComponent(lbl_login))
                     .addGroup(pnl_loginLayout.createSequentialGroup()
                         .addGap(58, 58, 58)
-                        .addGroup(pnl_loginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnl_loginLayout.createSequentialGroup()
-                                .addComponent(lbl_giris)
-                                .addGap(18, 18, 18)
-                                .addComponent(txt_gamer_name, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btn_giris))
-                            .addComponent(lbl_icon))))
+                        .addGroup(pnl_loginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lbl_state)
+                            .addGroup(pnl_loginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(pnl_loginLayout.createSequentialGroup()
+                                    .addComponent(lbl_giris)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(txt_gamer_name, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(btn_giris))
+                                .addComponent(lbl_icon)))))
                 .addContainerGap(66, Short.MAX_VALUE))
         );
         pnl_loginLayout.setVerticalGroup(
@@ -98,7 +108,9 @@ public class Login extends javax.swing.JFrame {
                     .addComponent(lbl_giris)
                     .addComponent(txt_gamer_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_giris))
-                .addGap(46, 46, 46))
+                .addGap(18, 18, 18)
+                .addComponent(lbl_state)
+                .addGap(11, 11, 11))
         );
 
         txt_gamer_name.getAccessibleContext().setAccessibleParent(this);
@@ -118,17 +130,21 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_girisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_girisActionPerformed
-        String gamer_name = txt_gamer_name.getText();
-            
-            Game oyun;
         try {
-            oyun = new Game(gamer_name);
-            oyun.setVisible(true);
-            this.dispose();
+            Client.Connect("127.0.0.1", 6000);
+            lbl_state.setVisible(true);
         } catch (IOException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
+        // Timer ile opponentFound kontrolü (Main UI thread'i donmaz!)
+        new javax.swing.Timer(500, e -> {
+            if (Login.opponentFound) {
+                lbl_state.setText("Rakip bulundu. Oyun başlıyor!");
+                ((javax.swing.Timer) e.getSource()).stop(); // Timer'ı durdur
+                System.out.println("Rakip bulundu. Oyun başlıyor!");
+            }
+        }).start();
     }//GEN-LAST:event_btn_girisActionPerformed
 
     /**
@@ -178,6 +194,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JLabel lbl_giris;
     private javax.swing.JLabel lbl_icon;
     private javax.swing.JLabel lbl_login;
+    private javax.swing.JLabel lbl_state;
     private javax.swing.JPanel pnl_login;
     public javax.swing.JTextField txt_gamer_name;
     // End of variables declaration//GEN-END:variables

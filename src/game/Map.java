@@ -4,6 +4,7 @@
  */
 package game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -13,51 +14,45 @@ import java.util.Random;
  *
  * @author iremayvaz
  */
-public class Map {
+public class Map implements java.io.Serializable {
     
     public int defaultPlayerTroop = 9;
     public int defaultOpponentTroop = 9;
 
-    public static ArrayList<Territory> all_territories; // Haritadaki fethedilecek bölgeler
-    public static Player player;
-    public static Player opponent;
+    public ArrayList<Territory> all_territories; // Haritadaki fethedilecek bölgeler
+    public ArrayList<Territory> player_territories; // oyuncunun bölgeleri
+    public ArrayList<Territory> opponent_territories; // rakibin bölgeleri
 
     public Map() {
         this.all_territories = new ArrayList<>();
+        this.player_territories = new ArrayList<>();
+        this.opponent_territories = new ArrayList<>();
     }
 
     public void addTerritory(Territory territory) {
         this.all_territories.add(territory);
     }
 
-    /*public void isOpponentFound(ArrayList<SClient> gamers) {
-        for (int i = 0; i < gamers.size(); i++) {
-            if (gamers.get(i).getOyuncu().getGamerID() != this.player.getGamerID()) {
-                this.setOpponent(gamers.get(i).getOyuncu());
-                break;
-            }
-        }
-    }*/
-
-    public void defaultTerritories() { // Oyun başlamadan oyunculara yer dağıt.
+    public void defaultTerritories(int playerID, int rivalID) { // Oyun başlamadan oyunculara yer dağıt.
         Collections.shuffle(all_territories); // Bölgeler listesini karıştır
 
         for (int i = 0; i < all_territories.size(); i++) { // karıştırılan listenin 
             if (i < 3) { // ilk 3'ü player'a
-                all_territories.get(i).setGamer(player); // bölgenin oyuncusuna hem oyuncuyu ekler hem de oyuncunun bölge listesine ekler
+                all_territories.get(i).playerID = playerID;
+                player_territories.add(all_territories.get(i)); // bölgenin oyuncusuna hem oyuncuyu ekler hem de oyuncunun bölge listesine ekler
             } else {
-                all_territories.get(i).setGamer(opponent); 
+                all_territories.get(i).playerID = rivalID;
+                opponent_territories.add(all_territories.get(i));
             }
 
         }
-
     }
     
     public void defaultTroops(){ // Oyun başlamadan oyuncuların askerlerini dağıt
         for(int i = 0; i < 3; i++){
-            player.territories.get(i).addTroops(1); // Her bölgede en az 1 asker olsun
+            player_territories.get(i).addTroops(1); // Her bölgede en az 1 asker olsun
             this.defaultPlayerTroop--; // olması gereken toplam asker sayısı azaltılır.
-            opponent.territories.get(i).addTroops(1); // Her bölgede en az 1 asker olsun
+            opponent_territories.get(i).addTroops(1); // Her bölgede en az 1 asker olsun
             this.defaultOpponentTroop--;
         }
         
@@ -65,22 +60,14 @@ public class Map {
         
         while (this.defaultPlayerTroop > 0) { // Player'ın askerlerini bölgelerine dağıt
             int i = rand.nextInt(3); // 3 bölgeye rastgele birer tane asker ekler
-            player.territories.get(i).addTroops(1);
+            player_territories.get(i).addTroops(1);
             this.defaultPlayerTroop--;
         }
         
         while (this.defaultOpponentTroop > 0) { // Opponent'in askerlerini bölgelerine dağıt
             int i = rand.nextInt(3); 
-            opponent.territories.get(i).addTroops(1);
+            opponent_territories.get(i).addTroops(1);
             this.defaultOpponentTroop--;
         }
-    }
-
-    public static Player getOpponent() {
-        return opponent;
-    }
-
-    public static void setOpponent(Player newOpponent) {
-        opponent = newOpponent;
     }
 }

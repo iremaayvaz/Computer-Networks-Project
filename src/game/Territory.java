@@ -4,6 +4,7 @@
  */
 package game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import javax.swing.JToggleButton;
 
@@ -12,25 +13,29 @@ import javax.swing.JToggleButton;
  *
  * @author iremayvaz
  */
-public class Territory {
+public class Territory implements java.io.Serializable {
 
     public String name;
-    public Player player;
+    public int playerID;
     public int totalTroop;
     public ArrayList<Territory> neighbours;
     public JToggleButton bolge_butonu;
 
-    public Territory(String name, JToggleButton bolge) {
+    public Territory(String name) {
         this.name = name;
         this.totalTroop = 0;
         this.neighbours = new ArrayList<>();
-        this.bolge_butonu = bolge;
     }
-
+    
+    // JToggleButton set et
+    public void setButton(JToggleButton btn){
+        this.bolge_butonu = btn;
+    }
+    
     // Bölgenin oyuncusunu ekleme aynı anda oyuncunun da bölgesini ekleme.
-    public void setGamer(Player oyuncu) {
-        this.player = oyuncu;
-        oyuncu.addTerritory(this); // Territory is also added to new owner's territory list.
+    public void setPlayerID(int id) {
+        this.playerID = id;
+        //oyuncu.addTerritory(this); // Territory is also added to new owner's territory list.
     }
 
     // Komşuluk ilişkileri
@@ -45,18 +50,18 @@ public class Territory {
     // Yeniden asker konuşlandırma için
     public void addTroops(int count) { // Different territories brings different number of troops
         this.totalTroop += count; // Bölgedeki toplam asker sayısı güncellenir
-        this.player.totalTroops += count; // Bölgenin oyuncusunun asker sayısı güncellenir.
+        //this.player.totalTroops += count; // Bölgenin oyuncusunun asker sayısı güncellenir.
     }
 
     public void removeTroops(int count) { // Different territories loses different number of troops
         this.totalTroop -= count;
-        this.player.totalTroops -= count;
+        //this.player.totalTroops -= count;
     }
     
-    public int howManyDices() { // O bölgedeki total asker sayısına göre zar sayısı belirle
+    public int howManyDices(boolean willAttack) { // O bölgedeki total asker sayısına göre zar sayısı belirle
         int diceCount = 0;
 
-        if (this.player.willAttack == false) { // saldırmıyoruz, savunuyoruz
+        if (willAttack) { // saldırmıyoruz, savunuyoruz
 
             if (this.totalTroop == 1) {
                 diceCount = 1;
