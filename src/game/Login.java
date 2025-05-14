@@ -142,7 +142,7 @@ public class Login extends javax.swing.JFrame {
             if (Login.opponentFound) {
                 lbl_state.setText("Rakip bulundu. Oyun başlıyor!");
                 ((javax.swing.Timer) e.getSource()).stop(); // Timer'ı durdur
-                System.out.println("Rakip bulundu. Oyun başlıyor!");
+                System.out.println("Harita oluşturuldu. Oyun başlıyor!");
             }
         }).start();
     }//GEN-LAST:event_btn_girisActionPerformed

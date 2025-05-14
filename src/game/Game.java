@@ -50,39 +50,49 @@ public class Game extends javax.swing.JFrame {
             switch (t.name) {
                 case "Afrika":
                     t.setButton(btn_afrika);
+                    break;
                 case "Asya":
                     t.setButton(btn_asya);
+                    break;
                 case "Avrupa":
                     t.setButton(btn_avrupa);
+                    break;
                 case "Avustralya":
                     t.setButton(btn_avustralya);
+                    break;
                 case "Güney Amerika":
                     t.setButton(btn_guneyAmerika);
+                    break;
                 case "Kuzey Amerika":
                     t.setButton(btn_kuzeyAmerika);
+                    break;
             }
 
         }
-        
+
         // Territory'leri oyuncularla eşle
         for (Territory t : gelenHarita) {
-            if(t.playerID == oyuncu.id){
+            if (t.playerID == oyuncu.id) {
                 oyuncu.territories.add(t);
-            }else{
+            } else {
                 rakip.territories.add(t);
             }
         }
-        
-        for(int i = 0; i < oyuncu.territories.size(); i++){
-            System.out.println(oyuncu.territories.get(i).name.toString() + ":" 
-                    + oyuncu.territories.get(i).playerID + ":" 
-                    + oyuncu.territories.get(i).totalTroop + ":" );
+
+        for (int i = 0; i < oyuncu.territories.size(); i++) {
+            System.out.println(oyuncu.territories.get(i).name.toString() + ":"
+                    + oyuncu.territories.get(i).playerID + ":"
+                    + oyuncu.territories.get(i).totalTroop);
         }
-        
-        for(int i = 0; i < rakip.territories.size(); i++){
-            System.out.println(rakip.territories.get(i).name.toString() + ":" 
-                    + rakip.territories.get(i).playerID + ":" 
-                    + rakip.territories.get(i).totalTroop + ":" );
+
+        for (int i = 0; i < rakip.territories.size(); i++) {
+            System.out.println(rakip.territories.get(i).name.toString() + ":"
+                    + rakip.territories.get(i).playerID + ":"
+                    + rakip.territories.get(i).totalTroop);
+        }
+
+        for(Territory t : map.all_territories){
+            t.bolge_butonu.setText(String.valueOf(t.totalTroop));
         }
 
     }
@@ -279,7 +289,7 @@ public class Game extends javax.swing.JFrame {
 
     public Territory getTerritoryByButton(JButton selectedButton) { // Bölgeleri butonundan bulma
         for (Territory t : Game.map.all_territories) {
-            if (t.bolge_butonu.equals(selectedButton)) {
+            if (t.getBolge_butonu().equals(selectedButton)) {
                 return t;
             }
         }
@@ -298,7 +308,7 @@ public class Game extends javax.swing.JFrame {
 
         } else { // sıra bende değilse ekrana dokunamam
             for (Territory t : Game.map.all_territories) {
-                t.bolge_butonu.setEnabled(false);
+                t.getBolge_butonu().setEnabled(false);
             }
             btn_attack.setEnabled(false);
             btn_deploy.setEnabled(false);

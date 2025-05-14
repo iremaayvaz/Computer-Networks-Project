@@ -32,6 +32,11 @@ public class Territory implements java.io.Serializable {
         this.bolge_butonu = btn;
     }
     
+    // JFrame'deki asker sayıları güncellemesi için
+    public JToggleButton getBolge_butonu() {
+        return bolge_butonu;
+    }
+    
     // Bölgenin oyuncusunu ekleme aynı anda oyuncunun da bölgesini ekleme.
     public void setPlayerID(int id) {
         this.playerID = id;
@@ -82,4 +87,5 @@ public class Territory implements java.io.Serializable {
         }
         return diceCount;
     }
+    
 }

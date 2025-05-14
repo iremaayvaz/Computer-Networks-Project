@@ -5,21 +5,18 @@
 package game;
 
 /**
- * 
- * Neden Serializable tabanlı da String tabanlı değil?
- * Çünkü içerik her şey olabilir. Projemiz 2 kişilik bir "oyun" projesi
- * Oyun strateji oyunu ve çok veri iletimi gerekebilir.
+ *
+ * Neden Serializable tabanlı da String tabanlı değil? Çünkü içerik her şey
+ * olabilir. Projemiz 2 kişilik bir "oyun" projesi Oyun strateji oyunu ve çok
+ * veri iletimi gerekebilir.
  *
  * @author iremayvaz
  */
 public class Message implements java.io.Serializable {
-    
+
     public enum Type // Mesaj türleri
     {
-        /**
-         * Login yapınca isimle server'a bilgi verilebilir
-         * 2. login olunca 2 tarafa da opponent found mesajı verilebilir?
-         */
+
         JOIN_SERVER, // Sunucuya katılma isteği 
         YOUR_ID, // Oyuncuya id'sini gönderir
         OPPONENT_FOUND, // Rakip bulundu, oyun başlasın
@@ -35,11 +32,11 @@ public class Message implements java.io.Serializable {
         GAME_OVER, // Oyun sonu
         DISCONNECT, // Bağlantı koptu
     }
-    
+
     public Type message_type;
     public Object content;
-    
-    public Message(Type tur, Object mesaj){
+
+    public Message(Type tur, Object mesaj) {
         this.message_type = tur;
         this.content = mesaj;
     }
