@@ -59,9 +59,9 @@ public class ServerListener extends Thread {
                 ArrayList<Territory> mapInfo = (ArrayList<Territory>) incomingMessage.content;
                 Game game = new Game(mapInfo);
                 game.setVisible(true);
+                Game.game.lbl_localClient.setText(Game.oyuncu.name);
+                Game.game.lbl_otherClient.setText(Game.rakip.name);
                 Login.login.dispose();
-                
-                Client.SendMessageToServer(new Message(Message.Type.YOUR_ID, "")); // Server'dan client id'si istiyoruz.
                 
             // DURUM LABEL'INI GÜNCELLE
             case YOUR_TURN:

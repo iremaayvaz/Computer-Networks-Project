@@ -254,6 +254,11 @@ public class Game extends javax.swing.JFrame {
         btn_skip.setBorderPainted(false);
         btn_skip.setContentAreaFilled(false);
         btn_skip.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btn_skip.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_skipActionPerformed(evt);
+            }
+        });
         pnl_harita.add(btn_skip, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 400, 80, -1));
 
         lbl_harita.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
@@ -304,6 +309,13 @@ public class Game extends javax.swing.JFrame {
 
         }*/
     }//GEN-LAST:event_btn_attackActionPerformed
+
+    private void btn_skipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_skipActionPerformed
+        if(btn_skip.isSelected()){
+            this.isYourTurn = false;
+            lbl_state.setText(rakip.name + "'s turn");
+        }
+    }//GEN-LAST:event_btn_skipActionPerformed
 
     public Territory getTerritoryByButton(JButton selectedButton) { // Bölgeleri butonundan bulma
         for (Territory t : Game.map.all_territories) {
