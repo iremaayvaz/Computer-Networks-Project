@@ -50,8 +50,10 @@ public class ServerListener extends Thread {
                 break;
             case OPPONENT_FOUND: // Rakip bulunduysa
                 System.out.println("Rakip bulundu, harita oluşturuluyor...");
+                String[] veri = incomingMessage.content.toString().split("#");
                 Game.rakip = new Player();
-                Game.rakip.id = (int) incomingMessage.content;
+                Game.rakip.id = Integer.parseInt(veri[0]);
+                Game.rakip.name = veri[1];
                 
                 Login.opponentFound = true; // Login'den Game'e
                 break;
