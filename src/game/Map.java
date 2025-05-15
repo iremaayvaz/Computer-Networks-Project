@@ -22,6 +22,11 @@ public class Map implements java.io.Serializable {
     public ArrayList<Territory> all_territories; // Haritadaki fethedilecek bölgeler
     public ArrayList<Territory> player_territories; // oyuncunun bölgeleri
     public ArrayList<Territory> opponent_territories; // rakibin bölgeleri
+    
+    public int id;
+    public int rivalId;
+    public String name;
+    public String rivalName;
 
     public Map() {
         this.all_territories = new ArrayList<>();

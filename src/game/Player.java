@@ -25,14 +25,13 @@ public class Player implements java.io.Serializable {
     public boolean willAttack; // saldırılacak mı
     
     public Player() {
-        this.id = 0;
         this.totalTroops = 0;
         this.territories = new ArrayList<>();
         this.willAttack = false;
     }
     
-    public Player(String name) {
-        this.id = 0;
+    public Player(String name, int id) {
+        this.id = id;
         this.name = name;
         this.totalTroops = 0;
         this.territories = new ArrayList<>();

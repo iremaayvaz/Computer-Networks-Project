@@ -4,6 +4,7 @@ package game;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
+import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -23,10 +24,10 @@ public class Game extends javax.swing.JFrame {
     public static Map map;
     public static Dice dice;
 
-    public static Player oyuncu = new Player();
+    public static Player oyuncu;
     public boolean isYourTurn; // sıra benim mi
 
-    public static Player rakip = new Player();
+    public static Player rakip;
 
     ArrayList<Territory> secilenBolgeler = new ArrayList<>(); // buton selected
 
@@ -44,6 +45,8 @@ public class Game extends javax.swing.JFrame {
         Game.game = this;
         Game.map = new Map();
         Game.map.all_territories = gelenHarita;
+
+        System.out.println("Benim oyuncu id: " + Game.oyuncu.id); // OYUNCU ID 0 KALIYOR DUZELT
 
         // Territory'leri butonlarla eşle
         for (Territory t : gelenHarita) {
@@ -72,27 +75,35 @@ public class Game extends javax.swing.JFrame {
 
         // Territory'leri oyuncularla eşle
         for (Territory t : gelenHarita) {
-            if (t.playerID == oyuncu.id) {
-                oyuncu.territories.add(t);
+            System.out.println(" --> playerID: " + t.playerID);
+            if (t.playerID == Game.oyuncu.id) {
+                Game.oyuncu.territories.add(t);
+                t.bolge_butonu.setForeground(Color.green);
             } else {
-                rakip.territories.add(t);
+                Game.rakip.territories.add(t);
+                t.bolge_butonu.setForeground(Color.red);
             }
         }
 
-        for (int i = 0; i < oyuncu.territories.size(); i++) {
-            System.out.println(oyuncu.territories.get(i).name.toString() + ":"
-                    + oyuncu.territories.get(i).playerID + ":"
-                    + oyuncu.territories.get(i).totalTroop);
+        for (int i = 0; i < Game.oyuncu.territories.size(); i++) {
+            System.out.println(Game.oyuncu.territories.get(i).name.toString() + ":"
+                    + Game.oyuncu.territories.get(i).playerID + ":"
+                    + Game.oyuncu.territories.get(i).totalTroop);
         }
 
-        for (int i = 0; i < rakip.territories.size(); i++) {
-            System.out.println(rakip.territories.get(i).name.toString() + ":"
-                    + rakip.territories.get(i).playerID + ":"
-                    + rakip.territories.get(i).totalTroop);
+        for (int i = 0; i < Game.rakip.territories.size(); i++) {
+            System.out.println(Game.rakip.territories.get(i).name.toString() + ":"
+                    + Game.rakip.territories.get(i).playerID + ":"
+                    + Game.rakip.territories.get(i).totalTroop);
         }
 
-        for(Territory t : map.all_territories){
+        for (Territory t : Game.map.all_territories) {
             t.bolge_butonu.setText(String.valueOf(t.totalTroop));
+
+        }
+
+        for (Territory t : Game.map.all_territories) {
+            t.bolge_butonu.addActionListener(e -> System.out.println(t.bolge_butonu.getText() + " butonuna basıldı"));
         }
 
     }
@@ -264,7 +275,7 @@ public class Game extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_attackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_attackActionPerformed
-        /* switch (this.secilenBolgeler.size()) {
+        switch (this.secilenBolgeler.size()) {
             case 0:
                 JOptionPane.showMessageDialog(null, "NO SELECTIONS TO ATTACK!", "WARNING", JOptionPane.WARNING_MESSAGE);
                 break;
@@ -272,15 +283,22 @@ public class Game extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "SELECT ONE MORE TO ATTACK!", "WARNING", JOptionPane.WARNING_MESSAGE);
                 break;
             case 2:
-                for (int i = 0; i < Game.map.all_territories.size(); i++) {
-                    if (Game.map.all_territories.get(i).bolge_butonu.isSelected()) {
-                        saldıran = Game.oyuncu.territories.get(i);
+                for (Territory t : Game.map.all_territories) {
+                    if (t.bolge_butonu.isSelected()) {
+                        secilenBolgeler.add(t);
                     }
                 }
+
+                Territory saldıran = this.secilenBolgeler.get(0);
+                System.out.println("saldıran : " + saldıran.name);
+                Territory savunan = this.secilenBolgeler.get(1);
+                System.out.println("savunan : " + savunan.name);
         }
 
-        if () {
-        saldırırken server üzerinden diğer client'a haber
+        /*if () {
+            saldırırken server üzerinden diğer client
+             
+            'a haber
         saldır
         saldırı sonucunu yolla
 

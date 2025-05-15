@@ -43,13 +43,16 @@ public class ServerListener extends Thread {
         switch (incomingMessage.message_type) {
             case YOUR_ID:
                 // oyuncunun id'si client id'si ile eşitlenir.
-                String[] ids = incomingMessage.content.toString().split("#");
-                Game.oyuncu.id = Integer.parseInt(ids[0]);
-                Game.rakip.id = Integer.parseInt(ids[1]);
+                Game.oyuncu = new Player();
+                Game.oyuncu.id = (int) incomingMessage.content;
+                Game.oyuncu.name = Login.login.txt_gamer_name.getText();
                 Client.SendMessageToServer(new Message(Message.Type.NAME, "")); // Server'dan client id'si istiyoruz.
                 break;
             case OPPONENT_FOUND: // Rakip bulunduysa
                 System.out.println("Rakip bulundu, harita oluşturuluyor...");
+                Game.rakip = new Player();
+                Game.rakip.id = (int) incomingMessage.content;
+                
                 Login.opponentFound = true; // Login'den Game'e
                 break;
             case MAP:
