@@ -1,16 +1,18 @@
+
 package game;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
+import client.Client;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JToggleButton;
 
 /**
  *
@@ -18,6 +20,7 @@ import javax.swing.JOptionPane;
  *
  * @author iremayvaz
  */
+
 public class Game extends javax.swing.JFrame {
 
     public static Game game;
@@ -46,7 +49,7 @@ public class Game extends javax.swing.JFrame {
         Game.map = new Map();
         Game.map.all_territories = gelenHarita;
 
-        System.out.println("Benim oyuncu id: " + Game.oyuncu.id); // OYUNCU ID 0 KALIYOR DUZELT
+        System.out.println("Benim oyuncu id: " + Game.oyuncu.id);
 
         // Territory'leri butonlarla eşle
         for (Territory t : gelenHarita) {
@@ -75,35 +78,63 @@ public class Game extends javax.swing.JFrame {
 
         // Territory'leri oyuncularla eşle
         for (Territory t : gelenHarita) {
-            System.out.println(" --> playerID: " + t.playerID);
-            if (t.playerID == Game.oyuncu.id) {
+            System.out.println(t.name + " --> playerID: " + t.playerID);
+            if (t.playerID == Game.oyuncu.id) { // her oyuncu kendi bölgelerini görmeli
                 Game.oyuncu.territories.add(t);
-                t.bolge_butonu.setForeground(Color.green);
+                t.owner = Game.oyuncu;
+                t.bolge_butonu.setForeground(Color.green); // kendi bölgeleri yeşil
             } else {
                 Game.rakip.territories.add(t);
-                t.bolge_butonu.setForeground(Color.red);
+                t.owner = Game.rakip;
+                t.bolge_butonu.setForeground(Color.red); // rakip bölgeler kırmızı
             }
         }
-
+        // kontrol için
         for (int i = 0; i < Game.oyuncu.territories.size(); i++) {
             System.out.println(Game.oyuncu.territories.get(i).name.toString() + ":"
                     + Game.oyuncu.territories.get(i).playerID + ":"
                     + Game.oyuncu.territories.get(i).totalTroop);
         }
-
+        // kontrol için
         for (int i = 0; i < Game.rakip.territories.size(); i++) {
             System.out.println(Game.rakip.territories.get(i).name.toString() + ":"
                     + Game.rakip.territories.get(i).playerID + ":"
                     + Game.rakip.territories.get(i).totalTroop);
         }
 
+        // Bölgelerin asker sayılarını frame'de göster
         for (Territory t : Game.map.all_territories) {
             t.bolge_butonu.setText(String.valueOf(t.totalTroop));
 
         }
 
+        // Bölge seçimleri için
         for (Territory t : Game.map.all_territories) {
-            t.bolge_butonu.addActionListener(e -> System.out.println(t.bolge_butonu.getText() + " butonuna basıldı"));
+            t.bolge_butonu.addActionListener(e -> {
+                if (this.secilenBolgeler.isEmpty()) {
+                    if (t.playerID == Game.oyuncu.id && t.totalTroop > 1) { // ilk secim kendi bölgesi olmalı
+                        this.secilenBolgeler.add(t);
+                    } else {
+                        JOptionPane.showMessageDialog(pnl_harita, "FIRST SELECT FROM YOUR TERRITORIES"
+                                + "\nWHICH HAS MORE THAN 1 TROOP!",
+                                "WARNING", JOptionPane.WARNING_MESSAGE);
+                    }
+                } else { // 2. bölge karşıdan olsun
+                    if (t.playerID != Game.oyuncu.id) {
+                        this.secilenBolgeler.add(t);
+                    } else {
+                        JOptionPane.showMessageDialog(pnl_harita, "SELECT FROM OPPONENT'S TERRITORIES!",
+                                "WARNING", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+
+                System.out.println(t.name + " listeye eklendi");
+            });
+        }
+
+        // kontrol için
+        for (Territory t : this.secilenBolgeler) {
+            System.out.println(t.name);
         }
 
     }
@@ -148,8 +179,8 @@ public class Game extends javax.swing.JFrame {
         pnl_harita.add(lbl_you, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 50, 40));
 
         lbl_localClient.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
-        lbl_localClient.setForeground(new java.awt.Color(204, 255, 255));
-        pnl_harita.add(lbl_localClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 30, 120, 40));
+        lbl_localClient.setForeground(new java.awt.Color(0, 255, 0));
+        pnl_harita.add(lbl_localClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 30, 120, 40));
 
         lbl_opponent.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         lbl_opponent.setForeground(new java.awt.Color(255, 255, 255));
@@ -157,7 +188,7 @@ public class Game extends javax.swing.JFrame {
         pnl_harita.add(lbl_opponent, new org.netbeans.lib.awtextra.AbsoluteConstraints(781, 30, 120, 40));
 
         lbl_otherClient.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
-        lbl_otherClient.setForeground(new java.awt.Color(153, 255, 153));
+        lbl_otherClient.setForeground(new java.awt.Color(255, 0, 0));
         pnl_harita.add(lbl_otherClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(632, 27, 130, 40));
 
         lbl_state.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
@@ -280,126 +311,170 @@ public class Game extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_attackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_attackActionPerformed
-        switch (this.secilenBolgeler.size()) {
-            case 0:
-                JOptionPane.showMessageDialog(null, "NO SELECTIONS TO ATTACK!", "WARNING", JOptionPane.WARNING_MESSAGE);
-                break;
-            case 1:
-                JOptionPane.showMessageDialog(null, "SELECT ONE MORE TO ATTACK!", "WARNING", JOptionPane.WARNING_MESSAGE);
-                break;
-            case 2:
-                for (Territory t : Game.map.all_territories) {
-                    if (t.bolge_butonu.isSelected()) {
-                        secilenBolgeler.add(t);
-                    }
-                }
+        handleSelection();
 
-                Territory saldıran = this.secilenBolgeler.get(0);
-                System.out.println("saldıran : " + saldıran.name);
-                Territory savunan = this.secilenBolgeler.get(1);
-                System.out.println("savunan : " + savunan.name);
+        // Listeyi kontrol et, en az 2 eleman yoksa işlem yapma
+        if (this.secilenBolgeler.size() < 2) {
+            JOptionPane.showMessageDialog(pnl_harita, "Please select two territories to attack!",
+                    "WARNING", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
-        /*if () {
-            saldırırken server üzerinden diğer client
-             
-            'a haber
-        saldır
-        saldırı sonucunu yolla
+        Territory saldiran = this.secilenBolgeler.get(0);
+        Territory savunan = this.secilenBolgeler.get(1);
 
-        }*/
+        if (Game.oyuncu.attack(saldiran, savunan)) {
+            try {
+                // guncel bilgileri ilet
+                saldiran.bolge_butonu.setText(String.valueOf(saldiran.totalTroop));
+                savunan.bolge_butonu.setText(String.valueOf(savunan.totalTroop));
+
+                Client.SendMessageToServer(new Message(Message.Type.ATTACK, secilenBolgeler));
+            } catch (IOException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        /**
+         * saldırırken server üzerinden diğer client
+         *
+         * 'a haber saldır saldırı sonucunu yolla
+         */
+        Game.oyuncu.willAttack = false; // saldırdı bitti
+        this.secilenBolgeler.clear();
+        btn_deploy.setVisible(true); // asker konuşlandırma aktif
+        setComboboxVisible();
+        btn_attack.setEnabled(false); // herkes 1 defa saldırabilir
     }//GEN-LAST:event_btn_attackActionPerformed
 
     private void btn_skipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_skipActionPerformed
-        if(btn_skip.isSelected()){
-            this.isYourTurn = false;
-            lbl_state.setText(rakip.name + "'s turn");
+        if (btn_skip.isSelected()) {
+            try {
+                this.isYourTurn = false;
+                lbl_state.setText(rakip.name + "'s turn");
+
+                Client.SendMessageToServer(new Message(Message.Type.SKIP_TURN, Game.oyuncu.id));
+            } catch (IOException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_btn_skipActionPerformed
 
-    public Territory getTerritoryByButton(JButton selectedButton) { // Bölgeleri butonundan bulma
-        for (Territory t : Game.map.all_territories) {
-            if (t.getBolge_butonu().equals(selectedButton)) {
-                return t;
-            }
+    // bölge seçimleri
+    public void handleSelection() {
+    if (!this.isYourTurn) { // sırası değilse
+        JOptionPane.showMessageDialog(pnl_harita, "NOT YOUR TURN!",
+                "WARNING", JOptionPane.WARNING_MESSAGE);
+    } else { // sırasıysa
+
+        switch (this.secilenBolgeler.size()) {
+            case 0:
+                JOptionPane.showMessageDialog(pnl_harita, "NO SELECTIONS TO ATTACK!",
+                        "WARNING", JOptionPane.WARNING_MESSAGE);
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(pnl_harita, "SELECT ONE MORE TO ATTACK!",
+                        "WARNING", JOptionPane.WARNING_MESSAGE);
+                break;
+            case 2:
+                Territory saldiran = this.secilenBolgeler.get(0);
+                System.out.println("saldıran : " + saldiran.name);
+                Territory savunan = this.secilenBolgeler.get(1);
+                System.out.println("savunan : " + savunan.name);
+                break;
+
         }
-        return null;
+
+        if (this.secilenBolgeler.size() > 3) {
+            JOptionPane.showMessageDialog(pnl_harita, "YOU CANNOT SELECT MORE THAN 2 TERRITORY TO ATTACK!",
+                    "WARNING", JOptionPane.WARNING_MESSAGE);
+        }
     }
+}
+
+    public JToggleButton getTerritoryByButton(String bolgeAdi) { // Bölge butonlarını bulma
+    for (Territory t : Game.map.all_territories) {
+        if (t.name.equals(bolgeAdi)) {
+            return t.bolge_butonu;
+        }
+    }
+    return null;
+}
 
     public void setComboboxVisible() {
-        if (btn_deploy.isSelected()) { // asker konuşlandırmak istiyorsam 
-            comboBox_moveTroops.setVisible(true); // combobox görünür olsun
-        }
+    if (btn_deploy.isSelected()) { // asker konuşlandırmak istiyorsam 
+        comboBox_moveTroops.setVisible(true); // combobox görünür olsun
     }
+}
 
     public void readyToAttack() {
-        if (lbl_state.getText() == "YOUR TURN") {
-            Game.oyuncu.willAttack = true;
+    if (lbl_state.getText() == "YOUR TURN") {
+        Game.oyuncu.willAttack = true;
 
-        } else { // sıra bende değilse ekrana dokunamam
-            for (Territory t : Game.map.all_territories) {
-                t.getBolge_butonu().setEnabled(false);
-            }
-            btn_attack.setEnabled(false);
-            btn_deploy.setEnabled(false);
-            btn_skip.setEnabled(false);
-            JOptionPane.showMessageDialog(null, "NOT YOUR TURN", "UYARI", JOptionPane.WARNING_MESSAGE);
+    } else { // sıra bende değilse ekrana dokunamam
+        for (Territory t : Game.map.all_territories) {
+            t.getBolge_butonu().setEnabled(false);
         }
+        btn_attack.setEnabled(false);
+        btn_deploy.setEnabled(false);
+        btn_skip.setEnabled(false);
+        JOptionPane.showMessageDialog(null, "NOT YOUR TURN", "UYARI", JOptionPane.WARNING_MESSAGE);
     }
+}
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+     */
+    try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new Game().setVisible(true);
-                } catch (IOException ex) {
-                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
+    } catch (ClassNotFoundException ex) {
+        java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (InstantiationException ex) {
+        java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (IllegalAccessException ex) {
+        java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        java.util.logging.Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+    //</editor-fold>
+
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+            try {
+                new Game().setVisible(true);
+            } catch (IOException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    });
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btn_afrika;

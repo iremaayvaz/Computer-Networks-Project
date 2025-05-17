@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JToggleButton;
 
 /**
  *
@@ -54,7 +55,7 @@ public class ServerListener extends Thread {
                 Game.rakip = new Player();
                 Game.rakip.id = Integer.parseInt(veri[0]);
                 Game.rakip.name = veri[1];
-                
+
                 Login.opponentFound = true; // Login'den Game'e
                 break;
             case MAP:
@@ -64,13 +65,32 @@ public class ServerListener extends Thread {
                 Game.game.lbl_localClient.setText(Game.oyuncu.name);
                 Game.game.lbl_otherClient.setText(Game.rakip.name);
                 Login.login.dispose();
+                break;
+            case ATTACK:
+                ArrayList<Territory> gelenSaldiriBilgileri = (ArrayList<Territory>) incomingMessage.content;
+                Territory saldiran = gelenSaldiriBilgileri.get(0);
+                Territory savunan = gelenSaldiriBilgileri.get(1);
+                JToggleButton saldiranButon = Game.game.getTerritoryByButton(saldiran.name);
+                JToggleButton savunanButon = Game.game.getTerritoryByButton(savunan.name);
+
+                if (saldiranButon != null) {
+                    // Asker sayısını güncelle
+                    saldiranButon.setText(String.valueOf(saldiran.totalTroop));
+                }
                 
+                if (savunanButon != null) {
+                    // Asker sayısını güncelle
+                    savunanButon.setText(String.valueOf(savunan.totalTroop));
+                }
+                break;
             // DURUM LABEL'INI GÜNCELLE
             case YOUR_TURN:
+                Game.game.isYourTurn = true;
                 Game.game.lbl_state.setText(incomingMessage.content.toString());
                 break;
 
             case OPPONENTS_TURN:
+                Game.game.isYourTurn = false;
                 Game.game.lbl_state.setText(incomingMessage.content.toString());
                 break;
             case DISCONNECT:

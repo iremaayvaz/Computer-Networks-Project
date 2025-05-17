@@ -5,7 +5,6 @@
 package game;
 
 import static game.Dice.*;
-import static game.Map.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -27,6 +26,7 @@ public class Player implements java.io.Serializable {
     public Player() {
         this.totalTroops = 0;
         this.territories = new ArrayList<>();
+        this.zarSonuclari = new ArrayList<>();
         this.willAttack = false;
     }
     
@@ -35,6 +35,7 @@ public class Player implements java.io.Serializable {
         this.name = name;
         this.totalTroops = 0;
         this.territories = new ArrayList<>();
+        this.zarSonuclari = new ArrayList<>();
         this.willAttack = false;
     }
 
@@ -76,39 +77,55 @@ public class Player implements java.io.Serializable {
         }
     }
 
-    /*public boolean attack(Territory from, Territory to) { // SALDIR!
-        if (from.totalTroop > 1
-                && // Savunma için 1 kişiyi bölgesinde bırakmalı
-                from.player != to.player
-                && // Saldırı farklı oyuncular arasında yapılır
-                from.isNeighbour(to)) { // Saldırı ancak komşu bölgeler arasında yapılabilir.
+    public boolean attack(Territory from, Territory to) { // SALDIR!
+    if (from.totalTroop > 1
+            && // Savunma için 1 kişiyi bölgesinde bırakmalı
+            from.playerID != to.playerID
+            && // Saldırı farklı oyuncular arasında yapılır
+            from.isNeighbour(to)) { // Saldırı ancak komşu bölgeler arasında yapılabilir.
 
-            while (from.totalTroop != 0 && to.totalTroop != 0) { // 2 taraftan birinin o bölgedeki asker sayısı 0 olana kadar saldır!
-                int diceCount_p = from.howManyDices();
-                from.player.zarSonuclari = rollMultiple(diceCount_p);
-
-                // Savunma
-                int diceCount_op = to.howManyDices();
-                to.player.zarSonuclari = rollMultiple(diceCount_op);
-
-                // Sonuçları karşılaştır
-                ArrayList<Boolean> sonuc = compareDiceResults(from.player.zarSonuclari, to.player.zarSonuclari);
-
-                // Karşılaştırmalara göre asker sayısı güncellenir
-                updateTroops(sonuc);
-
-                // zarSonuclari'nı bir sonraki zar atımı için clear et
-                from.player.zarSonuclari.clear();
-                to.player.zarSonuclari.clear();
-            }
-            return true;
-        } else {
-            return false;
+        // zarSonuclari null kontrolü
+        if (from.owner.zarSonuclari == null) {
+            from.owner.zarSonuclari = new ArrayList<>();
         }
-    }*/
+        if (to.owner.zarSonuclari == null) {
+            to.owner.zarSonuclari = new ArrayList<>();
+        }
+
+        while (from.totalTroop > 1 && to.totalTroop != 0) { // 2 taraftan birinin o bölgedeki asker sayısı 0 olana kadar saldır!
+            int diceCount_p = from.howManyDices(this.willAttack);
+            from.owner.zarSonuclari = Dice.rollMultiple(diceCount_p);
+
+            // Savunma
+            int diceCount_op = to.howManyDices(this.willAttack);
+            to.owner.zarSonuclari = Dice.rollMultiple(diceCount_op);
+
+            // Sonuçları karşılaştır
+            ArrayList<Boolean> sonuc = Dice.compareDiceResults(from.owner.zarSonuclari, to.owner.zarSonuclari);
+
+            // Sonuç boş değilse güncelle
+            if (sonuc != null && !sonuc.isEmpty()) {
+                // Karşılaştırmalara göre asker sayısı güncellenir
+                Dice.updateTroops(sonuc, from.owner, to.owner);
+            }
+
+            // zarSonuclari'nı bir sonraki zar atımı için clear et
+            from.owner.zarSonuclari.clear();
+            to.owner.zarSonuclari.clear();
+        }
+        
+        if(to.totalTroop == 0){ // bölge ele geçirildi mi?
+            to.owner.territories.remove(to);
+            from.owner.territories.add(to);
+            to.owner = from.owner;
+            to.playerID = from.playerID;
+            to.totalTroop = from.totalTroop / 2;
+            from.totalTroop = from.totalTroop / 2;
+        }
+        
+        return true;
+    } else {
+        return false;
+    }
 }
-/**
- * butonlar 1 askere sahipse oralara basılmamalı
- * ilk basılan butonun sahibine gore komsu
- * 
- */
+}

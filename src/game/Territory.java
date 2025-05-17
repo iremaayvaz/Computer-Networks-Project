@@ -19,8 +19,10 @@ public class Territory implements java.io.Serializable {
     public int playerID;
     public int totalTroop;
     public ArrayList<Territory> neighbours;
+    
     public JToggleButton bolge_butonu;
-
+    public Player owner;
+    
     public Territory(String name) {
         this.name = name;
         this.totalTroop = 0;
@@ -35,6 +37,14 @@ public class Territory implements java.io.Serializable {
     // JFrame'deki asker sayıları güncellemesi için
     public JToggleButton getBolge_butonu() {
         return bolge_butonu;
+    }
+    
+    public Player getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Player owner) {
+        this.owner = owner;
     }
     
     // Bölgenin oyuncusunu ekleme aynı anda oyuncunun da bölgesini ekleme.
