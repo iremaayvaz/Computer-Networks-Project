@@ -63,18 +63,18 @@ public class Dice implements java.io.Serializable{
         return diceResults;
     }
 
-    public static void updateTroops(ArrayList<Boolean> dice_results, Player sal, Player sav) { // Zar sonuçlarının karşılaştırmalarına göre asker sayılarını güncelle
+    public static void updateTroops(ArrayList<Boolean> dice_results, Territory sal, Territory sav) { // Zar sonuçlarının karşılaştırmalarına göre asker sayılarını güncelle
         // Null veya boş liste kontrolü
         if (dice_results == null || dice_results.isEmpty()) {
             return;
         }
         
         for (int i = 0; i < dice_results.size(); i++) {
-            if (sal.totalTroops != 0 && sav.totalTroops != 0) {
+            if (sal.totalTroop != 0 && sav.totalTroop != 0) {
                 if (dice_results.get(i)) { // true ise
-                    sav.totalTroops--;
+                    sav.totalTroop--;
                 } else { // false ise
-                    sal.totalTroops--;
+                    sal.totalTroop--;
                 }
             }
         }

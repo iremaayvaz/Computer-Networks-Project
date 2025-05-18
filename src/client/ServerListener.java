@@ -86,11 +86,15 @@ public class ServerListener extends Thread {
             // DURUM LABEL'INI GÜNCELLE
             case YOUR_TURN:
                 Game.game.isYourTurn = true;
+                Game.game.oyuncu.willAttack = true;
+                Game.game.rakip.willAttack = false;
                 Game.game.lbl_state.setText(incomingMessage.content.toString());
                 break;
 
             case OPPONENTS_TURN:
                 Game.game.isYourTurn = false;
+                Game.game.oyuncu.willAttack = false;
+                Game.game.rakip.willAttack = true;
                 Game.game.lbl_state.setText(incomingMessage.content.toString());
                 break;
             case DISCONNECT:
