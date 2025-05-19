@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 
 /**
  *
- * Server'dan gelen mesajları dinler 
- * Client tarafı
+ * Server'dan gelen mesajları dinler Client tarafı
  *
  * @author iremayvaz
  */
@@ -70,18 +70,28 @@ public class ServerListener extends Thread {
                 ArrayList<Territory> gelenSaldiriBilgileri = (ArrayList<Territory>) incomingMessage.content;
                 Territory saldiran = gelenSaldiriBilgileri.get(0);
                 Territory savunan = gelenSaldiriBilgileri.get(1);
+                
+                Territory from = Game.map.all_territories.stream()
+                        .filter(t -> t.name.equals(saldiran.name))
+                        .findFirst()
+                        .get();
+
+                Territory to = Game.map.all_territories.stream()
+                        .filter(t -> t.name.equals(savunan.name))
+                        .findFirst()
+                        .get();
+
                 JToggleButton saldiranButon = Game.game.getTerritoryByButton(saldiran.name);
                 JToggleButton savunanButon = Game.game.getTerritoryByButton(savunan.name);
-
-                if (saldiranButon != null) {
-                    // Asker sayısını güncelle
-                    saldiranButon.setText(String.valueOf(saldiran.totalTroop));
-                }
                 
-                if (savunanButon != null) {
-                    // Asker sayısını güncelle
-                    savunanButon.setText(String.valueOf(savunan.totalTroop));
-                }
+                from.totalTroop = saldiran.totalTroop;
+                to.totalTroop = savunan.totalTroop;
+                
+                SwingUtilities.invokeLater(() -> {
+                    saldiranButon.setText(String.valueOf(from.totalTroop));
+                    savunanButon.setText(String.valueOf(to.totalTroop));
+                });
+
                 break;
             // DURUM LABEL'INI GÜNCELLE
             case YOUR_TURN:

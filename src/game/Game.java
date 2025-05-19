@@ -322,6 +322,7 @@ public class Game extends javax.swing.JFrame {
                 this.isYourTurn = false;
                 lbl_state.setText(rakip.name + "'s turn");
                 btn_attack.setEnabled(true);
+                btn_skip.setSelected(false);
 
                 Client.SendMessageToServer(new Message(Message.Type.SKIP_TURN, Game.oyuncu.id));
             } catch (IOException ex) {
