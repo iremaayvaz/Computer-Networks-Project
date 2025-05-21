@@ -9,12 +9,14 @@ import game.Login;
 import game.Message;
 import static game.Message.Type.*;
 import game.Player;
+import game.Map;
 import game.Territory;
+import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JToggleButton;
+import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 /**
@@ -59,7 +61,7 @@ public class ServerListener extends Thread {
                 Login.opponentFound = true; // Login'den Game'e
                 break;
             case MAP:
-                ArrayList<Territory> mapInfo = (ArrayList<Territory>) incomingMessage.content;
+                Map mapInfo = (Map) incomingMessage.content;
                 Game game = new Game(mapInfo);
                 game.setVisible(true);
                 Game.game.lbl_localClient.setText(Game.oyuncu.name);
@@ -70,7 +72,7 @@ public class ServerListener extends Thread {
                 ArrayList<Territory> gelenSaldiriBilgileri = (ArrayList<Territory>) incomingMessage.content;
                 Territory saldiran = gelenSaldiriBilgileri.get(0);
                 Territory savunan = gelenSaldiriBilgileri.get(1);
-                
+
                 Territory from = Game.map.all_territories.stream()
                         .filter(t -> t.name.equals(saldiran.name))
                         .findFirst()
@@ -81,30 +83,50 @@ public class ServerListener extends Thread {
                         .findFirst()
                         .get();
 
-                JToggleButton saldiranButon = Game.game.getTerritoryByButton(saldiran.name);
-                JToggleButton savunanButon = Game.game.getTerritoryByButton(savunan.name);
-                
+                // Asker sayılarını güncelle
                 from.totalTroop = saldiran.totalTroop;
                 to.totalTroop = savunan.totalTroop;
-                
+
+                // Sahiplik bilgisini de güncelle (yeni eklenen kod)
+                to.playerID = savunan.playerID;
+                to.owner = savunan.playerID == Game.oyuncu.id ? Game.oyuncu : Game.rakip;
+
+                JButton saldiranButon = Game.game.getTerritoryByButton(saldiran.name);
+                JButton savunanButon = Game.game.getTerritoryByButton(savunan.name);
+
                 SwingUtilities.invokeLater(() -> {
+                    // Asker sayılarını güncelle
                     saldiranButon.setText(String.valueOf(from.totalTroop));
                     savunanButon.setText(String.valueOf(to.totalTroop));
-                });
 
+                    // Renkleri güncelle
+                    if (from.playerID == Game.oyuncu.id) {
+                        saldiranButon.setForeground(Color.GREEN);
+                    } else {
+                        saldiranButon.setForeground(Color.RED);
+                    }
+
+                    // Burada savunan bölgenin sahipliği değişmiş olabilir, ona göre renk ver
+                    if (to.playerID == Game.oyuncu.id) {
+                        savunanButon.setForeground(Color.GREEN);
+                    } else {
+                        savunanButon.setForeground(Color.RED);
+                    }
+                });
                 break;
             // DURUM LABEL'INI GÜNCELLE
             case YOUR_TURN:
-                Game.game.isYourTurn = true;
-                Game.game.oyuncu.willAttack = true;
-                Game.game.rakip.willAttack = false;
+                Game.secilenBolgeler.clear();
+                Game.isYourTurn = true;
+                Game.oyuncu.willAttack = true;
+                Game.rakip.willAttack = false;
                 Game.game.lbl_state.setText(incomingMessage.content.toString());
                 break;
 
             case OPPONENTS_TURN:
-                Game.game.isYourTurn = false;
-                Game.game.oyuncu.willAttack = false;
-                Game.game.rakip.willAttack = true;
+                Game.isYourTurn = false;
+                Game.oyuncu.willAttack = false;
+                Game.rakip.willAttack = true;
                 Game.game.lbl_state.setText(incomingMessage.content.toString());
                 break;
             case DISCONNECT:

@@ -6,7 +6,7 @@ package game;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import javax.swing.JToggleButton;
+import javax.swing.JButton;
 
 /**
  * Haritadaki bölgeler
@@ -15,27 +15,32 @@ import javax.swing.JToggleButton;
  */
 public class Territory implements java.io.Serializable {
 
-    public String name;
-    public int playerID;
-    public int totalTroop;
-    public ArrayList<Territory> neighbours;
+    public String name; // bolge ismi
+    public int totalTroop; // bolgedeki asker sayısı
+    public ArrayList<Territory> neighbours; // komsulari
 
-    public JToggleButton bolge_butonu;
-    public Player owner;
+    public JButton bolge_butonu;
+    public Player owner; // zar sonuclarina ulasalim
+    public int playerID;
+    
+    public boolean attacker; // saldıran
+    public boolean defender; // savunan
 
     public Territory(String name) {
         this.name = name;
         this.totalTroop = 0;
         this.neighbours = new ArrayList<>();
+        this.attacker = false;
+        this.defender = false;
     }
 
     // JToggleButton set et
-    public void setButton(JToggleButton btn) {
+    public void setButton(JButton btn) {
         this.bolge_butonu = btn;
     }
 
     // JFrame'deki asker sayıları güncellemesi için
-    public JToggleButton getBolge_butonu() {
+    public JButton getBolge_butonu() {
         return bolge_butonu;
     }
 
@@ -65,12 +70,10 @@ public class Territory implements java.io.Serializable {
     // Yeniden asker konuşlandırma için
     public void addTroops(int count) { // Different territories brings different number of troops
         this.totalTroop += count; // Bölgedeki toplam asker sayısı güncellenir
-        //this.player.totalTroops += count; // Bölgenin oyuncusunun asker sayısı güncellenir.
     }
 
     public void removeTroops(int count) { // Different territories loses different number of troops
         this.totalTroop -= count;
-        //this.player.totalTroops -= count;
     }
 
     public int howManyDices(boolean willAttack) { // O bölgedeki total asker sayısına göre zar sayısı belirle
@@ -130,46 +133,51 @@ public class Territory implements java.io.Serializable {
                 System.out.println("sav icin zar sonuclari listesi");
             }
 
-            while (this.totalTroop > 1 && to.totalTroop != 0) { // 2 taraftan birinin o bölgedeki asker sayısı 0 olana kadar saldır!
-                int diceCount_p = this.howManyDices(this.owner.willAttack);
-                this.owner.zarSonuclari = Dice.rollMultiple(diceCount_p);
-                System.out.println("sal " + this.name + " : " + this.totalTroop + " icin zar attı");
-                for(int i : this.owner.zarSonuclari){
-                    System.out.print(i + " :");
-                }
-                
-                // Savunma
-                int diceCount_op = to.howManyDices(to.owner.willAttack);
-                to.owner.zarSonuclari = Dice.rollMultiple(diceCount_op);
-                System.out.println("sav " + to.name + " : " + to.totalTroop + " icin zar attı");
-                for(int i : to.owner.zarSonuclari){
-                    System.out.print(i + " :");
-                }
-
-                // Sonuçları karşılaştır
-                ArrayList<Boolean> sonuc = Dice.compareDiceResults(this.owner.zarSonuclari, to.owner.zarSonuclari);
-                for(boolean i : sonuc){
-                    System.out.print(i + " :");
-                }
-                System.out.println("zar karşılaştıralım");
-                
-                // Sonuç boş değilse güncelle
-                if (sonuc != null && !sonuc.isEmpty()) {
-                    // Karşılaştırmalara göre asker sayısı güncellenir
-                    Dice.updateTroops(sonuc, this, to);
-                    System.out.println("asker sayılarını guncelledim");
-                    System.out.println("guncel sal " + this.name + " : " + this.totalTroop);
-                    System.out.println("guncel sav " + to.name + " : " + to.totalTroop);
-                } else{
-                    System.out.println("sonuc bos");
-                }
-
-                // zarSonuclari'nı bir sonraki zar atımı için clear et
-                this.owner.zarSonuclari.clear();
-                to.owner.zarSonuclari.clear();
-                turSayisi++;
+            //while (this.totalTroop != 0 && to.totalTroop != 0) { // 2 taraftan birinin o bölgedeki asker sayısı 0 olana kadar saldır!
+            // saldıran
+            int diceCount_p = this.howManyDices(this.owner.willAttack);
+            this.owner.zarSonuclari = Dice.rollMultiple(diceCount_p);
+            System.out.println("sal " + this.name + " : " + this.totalTroop);
+            System.out.println();
+            for (int i : this.owner.zarSonuclari) {
+                System.out.print(i + " :");
             }
-            
+
+            // Savunma
+            int diceCount_op = to.howManyDices(to.owner.willAttack);
+            to.owner.zarSonuclari = Dice.rollMultiple(diceCount_op);
+            System.out.println("sav " + to.name + " : " + to.totalTroop);
+            System.out.println();
+            for (int i : to.owner.zarSonuclari) {
+                System.out.print(i + " :");
+            }
+
+            // Sonuçları karşılaştır
+            ArrayList<Boolean> sonuc = Dice.compareDiceResults(this.owner.zarSonuclari, to.owner.zarSonuclari);
+            System.out.println();
+            for (boolean i : sonuc) {
+                System.out.print(i + " :");
+            }
+            System.out.println();
+            System.out.println("zar karşılaştıralım");
+
+            // Sonuç boş değilse güncelle
+            if (sonuc != null && !sonuc.isEmpty()) {
+                // Karşılaştırmalara göre asker sayısı güncellenir
+                Dice.updateTroops(sonuc, this, to);
+                System.out.println("asker sayılarını guncelledim");
+                System.out.println("guncel sal " + this.name + " : " + this.totalTroop);
+                System.out.println("guncel sav " + to.name + " : " + to.totalTroop);
+            } else {
+                System.out.println("sonuc bos");
+            }
+
+            // zarSonuclari'nı bir sonraki zar atımı için clear et
+            this.owner.zarSonuclari.clear();
+            to.owner.zarSonuclari.clear();
+            turSayisi++;
+            //}
+
             System.out.println("tur sayısı: " + turSayisi);
             if (to.totalTroop == 0) { // bölge ele geçirildi mi?
                 to.owner.territories.remove(to);
@@ -177,11 +185,21 @@ public class Territory implements java.io.Serializable {
                 to.owner = this.owner;
                 to.playerID = this.playerID;
                 to.totalTroop = this.totalTroop / 2;
-                this.totalTroop = this.totalTroop / 2;
+                this.totalTroop = this.totalTroop - to.totalTroop;
             }
 
             return true;
+        } else if (this.totalTroop < 1) {
+            System.out.println("asker sayısı 1'den az");
+            return false;
+        } else if (this.playerID == to.playerID) {
+            System.out.println("kendime mi saldırıcam?");
+            return false;
+        } else if (!this.isNeighbour(to)) {
+            System.out.println("komşum değil");
+            return false;
         } else {
+            System.out.println("saldırılamadı!");
             return false;
         }
     }

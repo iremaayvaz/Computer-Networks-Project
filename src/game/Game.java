@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.JToggleButton;
+import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -23,7 +24,6 @@ public class Game extends javax.swing.JFrame {
 
     public static Game game;
     public static Map map;
-    public static Dice dice;
 
     public static Player oyuncu;
     public static boolean isYourTurn; // sıra benim mi
@@ -36,96 +36,19 @@ public class Game extends javax.swing.JFrame {
         initComponents();
     }
 
-    public Game(ArrayList<Territory> gelenHarita) throws IOException {
+    public Game(Map gelenHarita) throws IOException {
         initComponents();
-        // en başta sadece attack yapabilsin
-        // yapmiyorsa skip edebilir.
-        comboBox_moveTroops.setVisible(false);
-        btn_deploy.setVisible(false);
-
         Game.game = this;
         Game.map = new Map();
-        Game.map.all_territories = gelenHarita;
+        Game.map.all_territories = gelenHarita.all_territories;
 
         System.out.println("Benim oyuncu id: " + Game.oyuncu.id);
 
-        // Territory'leri butonlarla eşle
-        for (Territory t : gelenHarita) {
-            switch (t.name) {
-                case "Afrika":
-                    t.setButton(btn_afrika);
-                    break;
-                case "Asya":
-                    t.setButton(btn_asya);
-                    break;
-                case "Avrupa":
-                    t.setButton(btn_avrupa);
-                    break;
-                case "Avustralya":
-                    t.setButton(btn_avustralya);
-                    break;
-                case "Güney Amerika":
-                    t.setButton(btn_guneyAmerika);
-                    break;
-                case "Kuzey Amerika":
-                    t.setButton(btn_kuzeyAmerika);
-                    break;
-            }
+        setTerritoryButtons(Game.map.all_territories);
 
-        }
+        haritaYerlestir(Game.map.all_territories);
 
-        // Territory'leri oyuncularla eşle
-        for (Territory t : gelenHarita) {
-            if (t.playerID == Game.oyuncu.id) { // her oyuncu kendi bölgelerini görmeli
-                Game.oyuncu.territories.add(t);
-                t.owner = Game.oyuncu;
-                t.bolge_butonu.setForeground(Color.green); // kendi bölgeleri yeşil
-            } else {
-                Game.rakip.territories.add(t);
-                t.owner = Game.rakip;
-                t.bolge_butonu.setForeground(Color.red); // rakip bölgeler kırmızı
-            }
-        }
-
-        // Bölgelerin asker sayılarını frame'de göster
-        for (Territory t : Game.map.all_territories) {
-            t.bolge_butonu.setText(String.valueOf(t.totalTroop));
-        }
-
-        // Bölge seçimleri için
-        for (Territory t : Game.map.all_territories) {
-            t.bolge_butonu.addActionListener(e -> {
-                // daha hic bolge secilmedi
-                if (Game.secilenBolgeler.isEmpty()) { 
-                    // ilk secim kendi bölgesi olmalı
-                    if (t.playerID == Game.oyuncu.id && t.totalTroop > 1) { 
-                        Game.secilenBolgeler.add(t);
-                        t.bolge_butonu.setSelected(false);
-                    } else {
-                        t.bolge_butonu.setSelected(false);
-                        JOptionPane.showMessageDialog(pnl_harita, "FIRST SELECT FROM YOUR TERRITORIES"
-                                + "\nWHICH HAS MORE THAN 1 TROOP!",
-                                "WARNING", JOptionPane.WARNING_MESSAGE);
-                    }
-                // 2. bölge karşıdan olsun
-                } else if (Game.secilenBolgeler.size() == 1) { 
-                    if (t.playerID != Game.oyuncu.id) {
-                        Game.secilenBolgeler.add(t);
-                        t.bolge_butonu.setSelected(false);
-                    } else {
-                        t.bolge_butonu.setSelected(false);
-                        JOptionPane.showMessageDialog(pnl_harita, "SELECT FROM OPPONENT'S TERRITORIES!",
-                                "WARNING", JOptionPane.WARNING_MESSAGE);
-                    }
-                // 2 den fazla seçilemez
-                } else { 
-                    t.bolge_butonu.setSelected(false);
-                    JOptionPane.showMessageDialog(pnl_harita, "YOU CANNOT SELECT MORE THAN 2 TERRITORY TO ATTACK!",
-                            "WARNING", JOptionPane.WARNING_MESSAGE);
-                }
-
-            });
-        }
+        addAction(Game.map.all_territories);
 
     }
 
@@ -145,17 +68,17 @@ public class Game extends javax.swing.JFrame {
         lbl_opponent = new javax.swing.JLabel();
         lbl_otherClient = new javax.swing.JLabel();
         lbl_state = new javax.swing.JLabel();
-        comboBox_moveTroops = new javax.swing.JComboBox<>();
-        btn_asya = new javax.swing.JToggleButton();
-        btn_avustralya = new javax.swing.JToggleButton();
-        btn_avrupa = new javax.swing.JToggleButton();
-        btn_afrika = new javax.swing.JToggleButton();
-        btn_kuzeyAmerika = new javax.swing.JToggleButton();
-        btn_guneyAmerika = new javax.swing.JToggleButton();
-        btn_attack = new javax.swing.JToggleButton();
-        btn_deploy = new javax.swing.JToggleButton();
-        btn_skip = new javax.swing.JToggleButton();
+        btn_attack = new javax.swing.JButton();
+        btn_deploy = new javax.swing.JButton();
+        btn_skip = new javax.swing.JButton();
+        btn_kuzeyAmerika = new javax.swing.JButton();
+        btn_guneyAmerika = new javax.swing.JButton();
+        btn_avrupa = new javax.swing.JButton();
+        btn_afrika = new javax.swing.JButton();
+        btn_asya = new javax.swing.JButton();
+        btn_avustralya = new javax.swing.JButton();
         lbl_harita = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
 
         jButton1.setText("jButton1");
 
@@ -185,70 +108,9 @@ public class Game extends javax.swing.JFrame {
         lbl_state.setForeground(new java.awt.Color(255, 255, 255));
         pnl_harita.add(lbl_state, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 30, 190, 30));
 
-        comboBox_moveTroops.setBackground(new java.awt.Color(0, 51, 255));
-        comboBox_moveTroops.setFont(new java.awt.Font("Helvetica Neue", 1, 12)); // NOI18N
-        comboBox_moveTroops.setForeground(new java.awt.Color(255, 255, 255));
-        pnl_harita.add(comboBox_moveTroops, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 330, 80, -1));
-
-        btn_asya.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
-        btn_asya.setForeground(new java.awt.Color(255, 255, 255));
-        btn_asya.setText("0");
-        btn_asya.setBorder(null);
-        btn_asya.setBorderPainted(false);
-        btn_asya.setContentAreaFilled(false);
-        btn_asya.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btn_asya.setFocusPainted(false);
-        pnl_harita.add(btn_asya, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 160, 170, 210));
-
-        btn_avustralya.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
-        btn_avustralya.setForeground(new java.awt.Color(255, 255, 255));
-        btn_avustralya.setText("0");
-        btn_avustralya.setBorder(null);
-        btn_avustralya.setBorderPainted(false);
-        btn_avustralya.setContentAreaFilled(false);
-        btn_avustralya.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        pnl_harita.add(btn_avustralya, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 510, 140, 100));
-
-        btn_avrupa.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
-        btn_avrupa.setForeground(new java.awt.Color(255, 255, 255));
-        btn_avrupa.setText("0");
-        btn_avrupa.setBorder(null);
-        btn_avrupa.setBorderPainted(false);
-        btn_avrupa.setContentAreaFilled(false);
-        btn_avrupa.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        pnl_harita.add(btn_avrupa, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 110, 270, 200));
-
-        btn_afrika.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
-        btn_afrika.setForeground(new java.awt.Color(255, 255, 255));
-        btn_afrika.setText("0");
-        btn_afrika.setBorder(null);
-        btn_afrika.setBorderPainted(false);
-        btn_afrika.setContentAreaFilled(false);
-        btn_afrika.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        pnl_harita.add(btn_afrika, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 360, 150, 190));
-
-        btn_kuzeyAmerika.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
-        btn_kuzeyAmerika.setForeground(new java.awt.Color(255, 255, 255));
-        btn_kuzeyAmerika.setText("0");
-        btn_kuzeyAmerika.setBorder(null);
-        btn_kuzeyAmerika.setBorderPainted(false);
-        btn_kuzeyAmerika.setContentAreaFilled(false);
-        btn_kuzeyAmerika.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        pnl_harita.add(btn_kuzeyAmerika, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 160, 210, 240));
-
-        btn_guneyAmerika.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
-        btn_guneyAmerika.setForeground(new java.awt.Color(255, 255, 255));
-        btn_guneyAmerika.setText("0");
-        btn_guneyAmerika.setBorder(null);
-        btn_guneyAmerika.setBorderPainted(false);
-        btn_guneyAmerika.setContentAreaFilled(false);
-        btn_guneyAmerika.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        pnl_harita.add(btn_guneyAmerika, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 420, 160, 240));
-
         btn_attack.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         btn_attack.setForeground(new java.awt.Color(153, 204, 255));
         btn_attack.setText("ATTACK");
-        btn_attack.setBorder(null);
         btn_attack.setBorderPainted(false);
         btn_attack.setContentAreaFilled(false);
         btn_attack.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -257,21 +119,24 @@ public class Game extends javax.swing.JFrame {
                 btn_attackActionPerformed(evt);
             }
         });
-        pnl_harita.add(btn_attack, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 230, -1, -1));
+        pnl_harita.add(btn_attack, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 280, -1, -1));
 
         btn_deploy.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         btn_deploy.setForeground(new java.awt.Color(153, 204, 255));
         btn_deploy.setText("DEPLOY");
-        btn_deploy.setBorder(null);
         btn_deploy.setBorderPainted(false);
         btn_deploy.setContentAreaFilled(false);
         btn_deploy.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        pnl_harita.add(btn_deploy, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 280, -1, -1));
+        btn_deploy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_deployActionPerformed(evt);
+            }
+        });
+        pnl_harita.add(btn_deploy, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 320, -1, -1));
 
         btn_skip.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
         btn_skip.setForeground(new java.awt.Color(204, 204, 204));
         btn_skip.setText("SKIP");
-        btn_skip.setBorder(null);
         btn_skip.setBorderPainted(false);
         btn_skip.setContentAreaFilled(false);
         btn_skip.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -280,11 +145,62 @@ public class Game extends javax.swing.JFrame {
                 btn_skipActionPerformed(evt);
             }
         });
-        pnl_harita.add(btn_skip, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 400, 80, -1));
+        pnl_harita.add(btn_skip, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 360, -1, -1));
+
+        btn_kuzeyAmerika.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
+        btn_kuzeyAmerika.setForeground(new java.awt.Color(255, 255, 255));
+        btn_kuzeyAmerika.setText("0");
+        btn_kuzeyAmerika.setBorderPainted(false);
+        btn_kuzeyAmerika.setContentAreaFilled(false);
+        btn_kuzeyAmerika.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnl_harita.add(btn_kuzeyAmerika, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 165, 210, 220));
+
+        btn_guneyAmerika.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
+        btn_guneyAmerika.setForeground(new java.awt.Color(255, 255, 255));
+        btn_guneyAmerika.setText("0");
+        btn_guneyAmerika.setBorderPainted(false);
+        btn_guneyAmerika.setContentAreaFilled(false);
+        btn_guneyAmerika.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnl_harita.add(btn_guneyAmerika, new org.netbeans.lib.awtextra.AbsoluteConstraints(165, 415, 170, 220));
+
+        btn_avrupa.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
+        btn_avrupa.setForeground(new java.awt.Color(255, 255, 255));
+        btn_avrupa.setText("0");
+        btn_avrupa.setBorderPainted(false);
+        btn_avrupa.setContentAreaFilled(false);
+        btn_avrupa.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnl_harita.add(btn_avrupa, new org.netbeans.lib.awtextra.AbsoluteConstraints(295, 95, 260, 200));
+
+        btn_afrika.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
+        btn_afrika.setForeground(new java.awt.Color(255, 255, 255));
+        btn_afrika.setText("0");
+        btn_afrika.setBorderPainted(false);
+        btn_afrika.setContentAreaFilled(false);
+        btn_afrika.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnl_harita.add(btn_afrika, new org.netbeans.lib.awtextra.AbsoluteConstraints(385, 345, 160, 230));
+
+        btn_asya.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
+        btn_asya.setForeground(new java.awt.Color(255, 255, 255));
+        btn_asya.setText("0");
+        btn_asya.setBorderPainted(false);
+        btn_asya.setContentAreaFilled(false);
+        btn_asya.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnl_harita.add(btn_asya, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 170, 230, 220));
+
+        btn_avustralya.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
+        btn_avustralya.setForeground(new java.awt.Color(255, 255, 255));
+        btn_avustralya.setText("0");
+        btn_avustralya.setBorderPainted(false);
+        btn_avustralya.setContentAreaFilled(false);
+        btn_avustralya.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnl_harita.add(btn_avustralya, new org.netbeans.lib.awtextra.AbsoluteConstraints(755, 505, 140, 120));
 
         lbl_harita.setFont(new java.awt.Font("Helvetica Neue", 1, 48)); // NOI18N
         lbl_harita.setIcon(new javax.swing.ImageIcon(getClass().getResource("/game/harita.png"))); // NOI18N
         pnl_harita.add(lbl_harita, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
+        jButton2.setText("jButton2");
+        pnl_harita.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 390, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -301,69 +217,44 @@ public class Game extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_attackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_attackActionPerformed
-        //handleSelection();
-
-        try {
-            Client.SendMessageToServer(new Message(Message.Type.ATTACK, Game.secilenBolgeler));
-        } catch (IOException ex) {
-            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        Game.oyuncu.willAttack = false; // saldırdı bitti
-        Game.secilenBolgeler.clear();
-        btn_deploy.setVisible(true); // asker konuşlandırma aktif
-        setComboboxVisible();
-        btn_attack.setEnabled(false); // herkes 1 defa saldırabilir
-    }//GEN-LAST:event_btn_attackActionPerformed
-
-    private void btn_skipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_skipActionPerformed
-        if (btn_skip.isSelected()) {
+        ArrayList<Territory> toSend = new ArrayList<>(Game.secilenBolgeler);
+        if (Game.secilenBolgeler.isEmpty()) {
+            System.out.println("liste boş");
+        } else {
+            System.out.println("secilen bolgeler");
+            for(Territory t: Game.secilenBolgeler){
+                System.out.println(t.name);
+            }
             try {
-                this.isYourTurn = false;
-                lbl_state.setText(rakip.name + "'s turn");
-                btn_attack.setEnabled(true);
-                btn_skip.setSelected(false);
-
-                Client.SendMessageToServer(new Message(Message.Type.SKIP_TURN, Game.oyuncu.id));
+                Client.SendMessageToServer(new Message(Message.Type.ATTACK, toSend));
             } catch (IOException ex) {
                 Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        // Listeyi temizle
+        Game.secilenBolgeler.clear();
+    }//GEN-LAST:event_btn_attackActionPerformed
+
+    private void btn_skipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_skipActionPerformed
+        try {
+            Client.SendMessageToServer(new Message(Message.Type.SKIP_TURN, Game.oyuncu.id));
+        } catch (IOException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btn_skipActionPerformed
 
-    // bölge seçimleri
-    public void handleSelection() {
-        if (!this.isYourTurn) { // sırası değilse
-            JOptionPane.showMessageDialog(pnl_harita, "NOT YOUR TURN!",
-                    "WARNING", JOptionPane.WARNING_MESSAGE);
-        } else { // sırasıysa
-
-            switch (this.secilenBolgeler.size()) {
-                case 0:
-                    JOptionPane.showMessageDialog(pnl_harita, "NO SELECTIONS TO ATTACK!",
-                            "WARNING", JOptionPane.WARNING_MESSAGE);
-                    break;
-                case 1:
-                    JOptionPane.showMessageDialog(pnl_harita, "SELECT ONE MORE TO ATTACK!",
-                            "WARNING", JOptionPane.WARNING_MESSAGE);
-                    break;
-                case 2:
-                    Territory saldiran = this.secilenBolgeler.get(0);
-                    System.out.println("saldıran : " + saldiran.name);
-                    Territory savunan = this.secilenBolgeler.get(1);
-                    System.out.println("savunan : " + savunan.name);
-                    break;
-
-            }
-
-            if (this.secilenBolgeler.size() > 3) {
-                JOptionPane.showMessageDialog(pnl_harita, "YOU CANNOT SELECT MORE THAN 2 TERRITORY TO ATTACK!",
-                        "WARNING", JOptionPane.WARNING_MESSAGE);
-            }
+    private void btn_deployActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deployActionPerformed
+        try { // guncellenecek
+            Client.SendMessageToServer(new Message(Message.Type.DEPLOY, Game.oyuncu.id));
+        } catch (IOException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
 
-    public JToggleButton getTerritoryByButton(String bolgeAdi) { // Bölge butonlarını bulma
+        // Listeyi temizle
+        Game.secilenBolgeler.clear();
+    }//GEN-LAST:event_btn_deployActionPerformed
+
+    public JButton getTerritoryByButton(String bolgeAdi) { // Bölge butonlarını bulma
         for (Territory t : Game.map.all_territories) {
             if (t.name.equals(bolgeAdi)) {
                 return t.bolge_butonu;
@@ -372,24 +263,89 @@ public class Game extends javax.swing.JFrame {
         return null;
     }
 
-    public void setComboboxVisible() {
-        if (btn_deploy.isSelected()) { // asker konuşlandırmak istiyorsam 
-            comboBox_moveTroops.setVisible(true); // combobox görünür olsun
+    public void setTerritoryButtons(ArrayList<Territory> guncelHarita) { // Bölge butonlarını bulma
+        // Territory'leri butonlarla eşle
+        for (Territory t : guncelHarita) {
+            switch (t.name) {
+                case "Afrika":
+                    t.setButton(btn_afrika);
+                    break;
+                case "Asya":
+                    t.setButton(btn_asya);
+                    break;
+                case "Avrupa":
+                    t.setButton(btn_avrupa);
+                    break;
+                case "Avustralya":
+                    t.setButton(btn_avustralya);
+                    break;
+                case "Güney Amerika":
+                    t.setButton(btn_guneyAmerika);
+                    break;
+                case "Kuzey Amerika":
+                    t.setButton(btn_kuzeyAmerika);
+                    break;
+            }
+
         }
     }
 
-    public void readyToAttack() {
-        if (lbl_state.getText() == "YOUR TURN") {
-            Game.oyuncu.willAttack = true;
+    public void haritaYerlestir(ArrayList<Territory> guncelHarita) {
+        JButton btn;
+        // Territory'leri oyuncularla eşle
+        for (Territory t : guncelHarita) {
+            btn = Game.game.getTerritoryByButton(t.name);
+            // Bölgelerin asker sayılarını frame'de göster
+            btn.setText(String.valueOf(t.totalTroop));
 
-        } else { // sıra bende değilse ekrana dokunamam
-            for (Territory t : Game.map.all_territories) {
-                t.getBolge_butonu().setEnabled(false);
+            if (t.playerID == Game.oyuncu.id) { // her oyuncu kendi bölgelerini görmeli
+                if (!Game.oyuncu.territories.contains(t)) {
+                    Game.oyuncu.territories.add(t);
+                    t.owner = Game.oyuncu;
+                }
+                btn.setForeground(Color.green); // kendi bölgeleri yeşil
+            } else {
+                if (!Game.rakip.territories.contains(t)) {
+                    Game.rakip.territories.add(t);
+                    t.owner = Game.rakip;
+                }
+                btn.setForeground(Color.red); // rakip bölgeler kırmızı
             }
-            btn_attack.setEnabled(false);
-            btn_deploy.setEnabled(false);
-            btn_skip.setEnabled(false);
-            JOptionPane.showMessageDialog(null, "NOT YOUR TURN", "UYARI", JOptionPane.WARNING_MESSAGE);
+        }
+
+    }
+
+    public void addAction(ArrayList<Territory> guncelHarita) {
+        JButton btn;
+        // Bölge seçimleri için
+        for (Territory t : guncelHarita) {
+            btn = Game.game.getTerritoryByButton(t.name);
+            btn.addActionListener(e -> {
+                // daha hic bolge secilmedi
+                if (Game.secilenBolgeler.isEmpty()) {
+                    // ilk secim kendi bölgesi olmalı ve geride 1 asker bırakabilmeli
+                    if (t.playerID == Game.oyuncu.id && t.totalTroop > 1) {
+                        Game.secilenBolgeler.add(t);
+                    } else {
+                        JOptionPane.showMessageDialog(pnl_harita, "FIRST SELECT FROM YOUR TERRITORIES"
+                                + "\nWHICH HAS MORE THAN 1 TROOP!",
+                                "WARNING", JOptionPane.WARNING_MESSAGE);
+                    }
+                    // 2. bölge karşıdan olsun
+                } else if (Game.secilenBolgeler.size() == 1) {
+                    if (t.playerID != Game.oyuncu.id) {
+                        Game.secilenBolgeler.add(t);
+                    } else {
+                        JOptionPane.showMessageDialog(pnl_harita, "SELECT FROM OPPONENT'S TERRITORIES!",
+                                "WARNING", JOptionPane.WARNING_MESSAGE);
+                    }
+                    // 2 den fazla seçilemez
+                } else {
+                    JOptionPane.showMessageDialog(pnl_harita, "YOU CANNOT SELECT MORE THAN 2 TERRITORY TO ATTACK!",
+                            "WARNING", JOptionPane.WARNING_MESSAGE);
+                }
+
+            });
         }
     }
 
@@ -448,17 +404,17 @@ public class Game extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JToggleButton btn_afrika;
-    private javax.swing.JToggleButton btn_asya;
-    private javax.swing.JToggleButton btn_attack;
-    private javax.swing.JToggleButton btn_avrupa;
-    private javax.swing.JToggleButton btn_avustralya;
-    private javax.swing.JToggleButton btn_deploy;
-    private javax.swing.JToggleButton btn_guneyAmerika;
-    private javax.swing.JToggleButton btn_kuzeyAmerika;
-    private javax.swing.JToggleButton btn_skip;
-    private javax.swing.JComboBox<Integer> comboBox_moveTroops;
+    public javax.swing.JButton btn_afrika;
+    private javax.swing.JButton btn_asya;
+    public javax.swing.JButton btn_attack;
+    public javax.swing.JButton btn_avrupa;
+    public javax.swing.JButton btn_avustralya;
+    private javax.swing.JButton btn_deploy;
+    public javax.swing.JButton btn_guneyAmerika;
+    public javax.swing.JButton btn_kuzeyAmerika;
+    private javax.swing.JButton btn_skip;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel lbl_harita;
     public javax.swing.JLabel lbl_localClient;
     private javax.swing.JLabel lbl_opponent;
