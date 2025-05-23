@@ -22,7 +22,7 @@ public class Territory implements java.io.Serializable {
     public JButton bolge_butonu;
     public Player owner; // zar sonuclarina ulasalim
     public int playerID;
-    
+
     public boolean attacker; // saldıran
     public boolean defender; // savunan
 
@@ -115,92 +115,69 @@ public class Territory implements java.io.Serializable {
         }
     }
 
-    public boolean attack(Territory to) { // SALDIR!
-        int turSayisi = 0;
-        if (this.totalTroop > 1
-                && // Savunma için 1 kişiyi bölgesinde bırakmalı
-                this.playerID != to.playerID
-                && // Saldırı farklı oyuncular arasında yapılır
-                this.isNeighbour(to)) {  // Saldırı ancak komşu bölgeler arasında yapılabilir.
-
-            // zarSonuclari null kontrolü
-            if (this.owner.zarSonuclari == null) {
-                this.owner.zarSonuclari = new ArrayList<>();
-                System.out.println("sal icin zar sonuclari listesi");
-            }
-            if (to.owner.zarSonuclari == null) {
-                to.owner.zarSonuclari = new ArrayList<>();
-                System.out.println("sav icin zar sonuclari listesi");
-            }
-
-            //while (this.totalTroop != 0 && to.totalTroop != 0) { // 2 taraftan birinin o bölgedeki asker sayısı 0 olana kadar saldır!
-            // saldıran
-            int diceCount_p = this.howManyDices(this.owner.willAttack);
-            this.owner.zarSonuclari = Dice.rollMultiple(diceCount_p);
-            System.out.println("sal " + this.name + " : " + this.totalTroop);
-            System.out.println();
-            for (int i : this.owner.zarSonuclari) {
-                System.out.print(i + " :");
-            }
-
-            // Savunma
-            int diceCount_op = to.howManyDices(to.owner.willAttack);
-            to.owner.zarSonuclari = Dice.rollMultiple(diceCount_op);
-            System.out.println("sav " + to.name + " : " + to.totalTroop);
-            System.out.println();
-            for (int i : to.owner.zarSonuclari) {
-                System.out.print(i + " :");
-            }
-
-            // Sonuçları karşılaştır
-            ArrayList<Boolean> sonuc = Dice.compareDiceResults(this.owner.zarSonuclari, to.owner.zarSonuclari);
-            System.out.println();
-            for (boolean i : sonuc) {
-                System.out.print(i + " :");
-            }
-            System.out.println();
-            System.out.println("zar karşılaştıralım");
-
-            // Sonuç boş değilse güncelle
-            if (sonuc != null && !sonuc.isEmpty()) {
-                // Karşılaştırmalara göre asker sayısı güncellenir
-                Dice.updateTroops(sonuc, this, to);
-                System.out.println("asker sayılarını guncelledim");
-                System.out.println("guncel sal " + this.name + " : " + this.totalTroop);
-                System.out.println("guncel sav " + to.name + " : " + to.totalTroop);
-            } else {
-                System.out.println("sonuc bos");
-            }
-
-            // zarSonuclari'nı bir sonraki zar atımı için clear et
-            this.owner.zarSonuclari.clear();
-            to.owner.zarSonuclari.clear();
-            turSayisi++;
-            //}
-
-            System.out.println("tur sayısı: " + turSayisi);
-            if (to.totalTroop == 0) { // bölge ele geçirildi mi?
-                to.owner.territories.remove(to);
-                this.owner.territories.add(to);
-                to.owner = this.owner;
-                to.playerID = this.playerID;
-                to.totalTroop = this.totalTroop / 2;
-                this.totalTroop = this.totalTroop - to.totalTroop;
-            }
-
-            return true;
-        } else if (this.totalTroop < 1) {
-            System.out.println("asker sayısı 1'den az");
-            return false;
-        } else if (this.playerID == to.playerID) {
-            System.out.println("kendime mi saldırıcam?");
-            return false;
-        } else if (!this.isNeighbour(to)) {
-            System.out.println("komşum değil");
-            return false;
-        } else {
-            System.out.println("saldırılamadı!");
+    public boolean attack(Territory to) {
+        if (this.totalTroop <= 1
+                || this.playerID == to.playerID
+                || !this.isNeighbour(to)) {
+            System.out.println("Attack conditions not met");
             return false;
         }
+
+        // Initialize dice results if null
+        if (this.owner.zarSonuclari == null) {
+            this.owner.zarSonuclari = new ArrayList<>();
+        }
+        if (to.owner.zarSonuclari == null) {
+            to.owner.zarSonuclari = new ArrayList<>();
+        }
+
+        // Attack until one side has no troops left or attacker gives up
+        while (this.totalTroop > 1 && to.totalTroop > 0) {
+            // Attacker rolls dice
+            int attackerDiceCount = this.howManyDices(true);
+            this.owner.zarSonuclari = Dice.rollMultiple(attackerDiceCount);
+            System.out.println("Attacker " + this.name + " troops: " + this.totalTroop
+                    + " rolled: " + this.owner.zarSonuclari);
+
+            // Defender rolls dice
+            int defenderDiceCount = to.howManyDices(false);
+            to.owner.zarSonuclari = Dice.rollMultiple(defenderDiceCount);
+            System.out.println("Defender " + to.name + " troops: " + to.totalTroop
+                    + " rolled: " + to.owner.zarSonuclari);
+
+            // Compare results
+            ArrayList<Boolean> results = Dice.compareDiceResults(
+                    this.owner.zarSonuclari, to.owner.zarSonuclari);
+            System.out.println("Results: " + results);
+
+            // Update troops based on results
+            Dice.updateTroops(results, this, to);
+            System.out.println("After battle - Attacker: " + this.totalTroop
+                    + " Defender: " + to.totalTroop);
+
+            // Clear dice results for next round
+            this.owner.zarSonuclari.clear();
+            to.owner.zarSonuclari.clear();
+        }
+
+        // If defender is conquered
+        if (to.totalTroop == 0) {
+            // Remove from original owner
+            to.owner.territories.remove(to);
+
+            // Transfer ownership
+            to.owner = this.owner;
+            to.playerID = this.playerID;
+            this.owner.territories.add(to);
+
+            // Move troops (leave at least 1 in original territory)
+            int movingTroops = this.totalTroop - 1;
+            to.totalTroop = movingTroops;
+            this.totalTroop -= movingTroops;
+
+            System.out.println(to.name + " conquered by " + this.owner.name);
+        }
+
+        return true;
     }
 }

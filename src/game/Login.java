@@ -138,13 +138,13 @@ public class Login extends javax.swing.JFrame {
         }
 
         // Timer ile opponentFound kontrolü (Main UI thread'i donmaz!)
-        new javax.swing.Timer(500, e -> {
+        //new javax.swing.Timer(500, e -> {
             if (Login.opponentFound) {
                 lbl_state.setText("Rakip bulundu. Oyun başlıyor!");
-                ((javax.swing.Timer) e.getSource()).stop(); // Timer'ı durdur
+                //((javax.swing.Timer) e.getSource()).stop(); // Timer'ı durdur
                 System.out.println("logHarita oluşturuldu. Oyun başlıyor!");
             }
-        }).start();
+        //}).start();
     }//GEN-LAST:event_btn_girisActionPerformed
 
     /**

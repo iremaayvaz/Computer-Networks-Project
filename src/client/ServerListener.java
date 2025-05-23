@@ -69,54 +69,39 @@ public class ServerListener extends Thread {
                 Login.login.dispose();
                 break;
             case ATTACK:
-                ArrayList<Territory> gelenSaldiriBilgileri = (ArrayList<Territory>) incomingMessage.content;
-                Territory saldiran = gelenSaldiriBilgileri.get(0);
-                Territory savunan = gelenSaldiriBilgileri.get(1);
+                System.out.println("=== CLIENT ATTACK MESAJI ALDI ===");
 
-                Territory from = Game.map.all_territories.stream()
-                        .filter(t -> t.name.equals(saldiran.name))
-                        .findFirst()
-                        .get();
+                ArrayList<Territory> updatedMap = (ArrayList<Territory>) incomingMessage.content;
 
-                Territory to = Game.map.all_territories.stream()
-                        .filter(t -> t.name.equals(savunan.name))
-                        .findFirst()
-                        .get();
-
-                // Asker sayılarını güncelle
-                from.totalTroop = saldiran.totalTroop;
-                to.totalTroop = savunan.totalTroop;
-
-                // Sahiplik bilgisini de güncelle (yeni eklenen kod)
-                to.playerID = savunan.playerID;
-                to.owner = savunan.playerID == Game.oyuncu.id ? Game.oyuncu : Game.rakip;
-
-                JButton saldiranButon = Game.game.getTerritoryByButton(saldiran.name);
-                JButton savunanButon = Game.game.getTerritoryByButton(savunan.name);
-
-                SwingUtilities.invokeLater(() -> {
-                    // Asker sayılarını güncelle
-                    saldiranButon.setText(String.valueOf(from.totalTroop));
-                    savunanButon.setText(String.valueOf(to.totalTroop));
-
-                    // Renkleri güncelle
-                    if (from.playerID == Game.oyuncu.id) {
-                        saldiranButon.setForeground(Color.GREEN);
-                    } else {
-                        saldiranButon.setForeground(Color.RED);
+                // Update game data first (outside SwingUtilities)
+                for (Territory updatedTerritory : updatedMap) {
+                    for (Territory localTerritory : Game.map.all_territories) {
+                        if (localTerritory.name.equals(updatedTerritory.name)) {
+                            localTerritory.totalTroop = updatedTerritory.totalTroop;
+                            localTerritory.playerID = updatedTerritory.playerID;
+                            localTerritory.owner = updatedTerritory.owner;
+                            localTerritory.attacker = false;
+                            localTerritory.defender = false;
+                            break;
+                        }
                     }
+                }
 
-                    // Burada savunan bölgenin sahipliği değişmiş olabilir, ona göre renk ver
-                    if (to.playerID == Game.oyuncu.id) {
-                        savunanButon.setForeground(Color.GREEN);
-                    } else {
-                        savunanButon.setForeground(Color.RED);
+                // Only UI updates go inside SwingUtilities
+                SwingUtilities.invokeLater(() -> {
+                    Game.game.haritaYerlestir(Game.map.all_territories);
+
+                    // Debug output (optional)
+                    for (Territory t : Game.map.all_territories) {
+                        System.out.println(t.name + ": " + t.totalTroop + " asker, sahip: " + t.playerID);
                     }
                 });
+
+                System.out.println("=== CLIENT GÜNCELLEME TAMAMLANDI ===");
                 break;
             // DURUM LABEL'INI GÜNCELLE
             case YOUR_TURN:
-                Game.secilenBolgeler.clear();
+                //Game.secilenBolgeler.clear();
                 Game.isYourTurn = true;
                 Game.oyuncu.willAttack = true;
                 Game.rakip.willAttack = false;

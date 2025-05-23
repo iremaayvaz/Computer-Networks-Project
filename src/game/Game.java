@@ -12,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -30,7 +29,8 @@ public class Game extends javax.swing.JFrame {
 
     public static Player rakip;
 
-    public static ArrayList<Territory> secilenBolgeler = new ArrayList<>(); // buton selected
+    //public static ArrayList<Territory> secilenBolgeler = new ArrayList<>(); // buton selected
+    public static int count = 0; // seçim için
 
     public Game() throws IOException {
         initComponents();
@@ -217,22 +217,25 @@ public class Game extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_attackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_attackActionPerformed
-        ArrayList<Territory> toSend = new ArrayList<>(Game.secilenBolgeler);
+        /*ArrayList<Territory> toSend = new ArrayList<>(Game.secilenBolgeler);
         if (Game.secilenBolgeler.isEmpty()) {
             System.out.println("liste boş");
         } else {
             System.out.println("secilen bolgeler");
-            for(Territory t: Game.secilenBolgeler){
-                System.out.println(t.name);
-            }
-            try {
-                Client.SendMessageToServer(new Message(Message.Type.ATTACK, toSend));
-            } catch (IOException ex) {
-                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            for (Territory t : Game.secilenBolgeler) {
+                System.out.println(t.name + ":" + t.totalTroop);
+            }*/
+        try {
+            Client.SendMessageToServer(new Message(Message.Type.ATTACK, Game.map.all_territories));
+            System.out.println("Count: " + count);
+        } catch (IOException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            count = 0;
         }
+        //}
         // Listeyi temizle
-        Game.secilenBolgeler.clear();
+        //Game.secilenBolgeler.clear();
     }//GEN-LAST:event_btn_attackActionPerformed
 
     private void btn_skipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_skipActionPerformed
@@ -251,7 +254,7 @@ public class Game extends javax.swing.JFrame {
         }
 
         // Listeyi temizle
-        Game.secilenBolgeler.clear();
+        //Game.secilenBolgeler.clear();
     }//GEN-LAST:event_btn_deployActionPerformed
 
     public JButton getTerritoryByButton(String bolgeAdi) { // Bölge butonlarını bulma
@@ -292,27 +295,25 @@ public class Game extends javax.swing.JFrame {
 
     public void haritaYerlestir(ArrayList<Territory> guncelHarita) {
         JButton btn;
-        // Territory'leri oyuncularla eşle
+
+        // Clear lists first to prevent duplicates and old ownership
+        Game.oyuncu.territories.clear();
+        Game.rakip.territories.clear();
+
         for (Territory t : guncelHarita) {
             btn = Game.game.getTerritoryByButton(t.name);
-            // Bölgelerin asker sayılarını frame'de göster
             btn.setText(String.valueOf(t.totalTroop));
 
-            if (t.playerID == Game.oyuncu.id) { // her oyuncu kendi bölgelerini görmeli
-                if (!Game.oyuncu.territories.contains(t)) {
-                    Game.oyuncu.territories.add(t);
-                    t.owner = Game.oyuncu;
-                }
-                btn.setForeground(Color.green); // kendi bölgeleri yeşil
+            if (t.playerID == Game.oyuncu.id) {
+                Game.oyuncu.territories.add(t);
+                t.owner = Game.oyuncu;
+                btn.setForeground(Color.green);
             } else {
-                if (!Game.rakip.territories.contains(t)) {
-                    Game.rakip.territories.add(t);
-                    t.owner = Game.rakip;
-                }
-                btn.setForeground(Color.red); // rakip bölgeler kırmızı
+                Game.rakip.territories.add(t);
+                t.owner = Game.rakip;
+                btn.setForeground(Color.red);
             }
         }
-
     }
 
     public void addAction(ArrayList<Territory> guncelHarita) {
@@ -322,19 +323,25 @@ public class Game extends javax.swing.JFrame {
             btn = Game.game.getTerritoryByButton(t.name);
             btn.addActionListener(e -> {
                 // daha hic bolge secilmedi
-                if (Game.secilenBolgeler.isEmpty()) {
+                //if (Game.secilenBolgeler.isEmpty()) {
+                if (count == 0) {
                     // ilk secim kendi bölgesi olmalı ve geride 1 asker bırakabilmeli
                     if (t.playerID == Game.oyuncu.id && t.totalTroop > 1) {
-                        Game.secilenBolgeler.add(t);
+                        //Game.secilenBolgeler.add(t);
+                        t.attacker = true;
+                        count++;
                     } else {
                         JOptionPane.showMessageDialog(pnl_harita, "FIRST SELECT FROM YOUR TERRITORIES"
                                 + "\nWHICH HAS MORE THAN 1 TROOP!",
                                 "WARNING", JOptionPane.WARNING_MESSAGE);
                     }
                     // 2. bölge karşıdan olsun
-                } else if (Game.secilenBolgeler.size() == 1) {
+                    //} else if (Game.secilenBolgeler.size() == 1) {
+                } else if (count == 1) {
                     if (t.playerID != Game.oyuncu.id) {
-                        Game.secilenBolgeler.add(t);
+                        //Game.secilenBolgeler.add(t);
+                        t.defender = true;
+                        count++;
                     } else {
                         JOptionPane.showMessageDialog(pnl_harita, "SELECT FROM OPPONENT'S TERRITORIES!",
                                 "WARNING", JOptionPane.WARNING_MESSAGE);
